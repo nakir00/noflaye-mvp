@@ -13,35 +13,18 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create roles
-        $superAdmin = Role::create([
-            'name' => 'Super Admin',
-            'slug' => 'super_admin',
-            'description' => 'Full system access',
-            'level' => 100,
-            'is_system' => true,
+        // Seed roles et permissions d'abord
+        $this->call([
+            RoleSeeder::class,
+            PermissionSeeder::class,
+            RolePermissionSeeder::class,
         ]);
 
-        $shopOwner = Role::create([
-            'name' => 'Shop Owner',
-            'slug' => 'shop_owner',
-            'description' => 'Shop management access',
-            'level' => 50,
-        ]);
-
-        $supplierOwner = Role::create([
-            'name' => 'Supplier Owner',
-            'slug' => 'supplier_owner',
-            'description' => 'Supplier management access',
-            'level' => 50,
-        ]);
-
-        $driver = Role::create([
-            'name' => 'Driver',
-            'slug' => 'driver',
-            'description' => 'Delivery driver access',
-            'level' => 20,
-        ]);
+        // Récupérer les rôles créés
+        $superAdmin = Role::where('slug', 'super_admin')->first();
+        $shopManager = Role::where('slug', 'shop_manager')->first();
+        $supplierManager = Role::where('slug', 'supplier_manager')->first();
+        $driver = Role::where('slug', 'driver')->first();
 
         // Create admin user
         $admin = User::create([
@@ -72,12 +55,12 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // Create shop owner user
+        // Create shop manager user
         $shopUser = User::create([
             'name' => 'Amadou Diop',
             'email' => 'shop@noflaye.sn',
             'password' => Hash::make('password'),
-            'primary_role_id' => $shopOwner->id,
+            'primary_role_id' => $shopManager->id,
         ]);
 
         $shopUser->shops()->attach([$shop1->id, $shop2->id]);
@@ -93,12 +76,12 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // Create supplier owner user
+        // Create supplier manager user
         $supplierUser = User::create([
             'name' => 'Fatou Sall',
             'email' => 'supplier@noflaye.sn',
             'password' => Hash::make('password'),
-            'primary_role_id' => $supplierOwner->id,
+            'primary_role_id' => $supplierManager->id,
         ]);
 
         $supplierUser->suppliers()->attach($supplier->id);
@@ -113,8 +96,8 @@ class DatabaseSeeder extends Seeder
 
         $this->command->info('Database seeded successfully!');
         $this->command->info('Admin: admin@noflaye.sn / password');
-        $this->command->info('Shop: shop@noflaye.sn / password');
-        $this->command->info('Supplier: supplier@noflaye.sn / password');
+        $this->command->info('Shop Manager: shop@noflaye.sn / password');
+        $this->command->info('Supplier Manager: supplier@noflaye.sn / password');
         $this->command->info('Driver: driver@noflaye.sn / password');
     }
 }

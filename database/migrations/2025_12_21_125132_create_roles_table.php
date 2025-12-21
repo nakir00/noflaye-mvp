@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->integer('level')->default(0);
+            $table->boolean('active')->default(true);
             $table->boolean('is_system')->default(false);
+            $table->string('color', 50)->nullable();
             $table->timestamps();
         });
     }

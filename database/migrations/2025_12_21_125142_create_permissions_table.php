@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->text('description')->nullable();
+            $table->string('group_name', 100)->nullable();
+            $table->string('action_type', 50)->nullable()->comment('read, create, update, delete');
+            $table->boolean('active')->default(true);
+            $table->boolean('is_system')->default(false);
             $table->timestamps();
         });
     }

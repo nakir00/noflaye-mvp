@@ -17,13 +17,16 @@ class Role extends Model
         'slug',
         'description',
         'level',
+        'active',
         'is_system',
+        'color',
     ];
 
     protected function casts(): array
     {
         return [
             'is_system' => 'boolean',
+            'active' => 'boolean',
         ];
     }
 
@@ -34,6 +37,35 @@ class Role extends Model
 
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(Permission::class, 'role_permissions')->withTimestamps();
+        return $this->belongsToMany(Permission::class, 'role_permissions')
+            ->withTimestamps();
+    }
+
+    /**
+     * Vérifie si le rôle a une permission
+     */
+    public function hasPermission(string $permissionSlug): bool
+    {
+        return $this->permissions()->where('slug', $permissionSlug)->exists();
+    }
+
+    /**
+     * Hiérarchie - Rôles parents
+     */
+    public function parents(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'role_hierarchy', 'child_role_id', 'parent_role_id')
+            ->withPivot('inheritance_type')
+            ->withTimestamps();
+    }
+
+    /**
+     * Hiérarchie - Rôles enfants
+     */
+    public function children(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'role_hierarchy', 'parent_role_id', 'child_role_id')
+            ->withPivot('inheritance_type')
+            ->withTimestamps();
     }
 }
