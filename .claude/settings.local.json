@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer require:*)",
+      "Bash(./artisan:*)",
+      "Bash(npm install:*)",
+      "Bash(export PATH=\"/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\")",
+      "Bash(php artisan:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "laravel-boost"
+  ]
+}
