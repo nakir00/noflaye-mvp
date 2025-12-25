@@ -76,30 +76,59 @@ class RoleSeeder extends Seeder
                 'name' => 'Manager Cuisine',
                 'slug' => 'kitchen_manager',
                 'description' => 'Responsable de cuisine, gestion des commandes et stock',
-                'level' => 72,
+                'level' => 75,
                 'active' => true,
                 'is_system' => false,
-                'color' => 'warning',
+                'color' => 'orange',
             ],
             [
                 'name' => 'Staff Cuisine',
                 'slug' => 'kitchen_staff',
                 'description' => 'Employé de cuisine, préparation des commandes',
-                'level' => 70,
+                'level' => 60,
                 'active' => true,
                 'is_system' => false,
-                'color' => 'warning',
+                'color' => 'orange',
             ],
 
             // Livraison
             [
+                'name' => 'Manager Livreur',
+                'slug' => 'driver_manager',
+                'description' => 'Gestion des livreurs et opérations de livraison',
+                'level' => 70,
+                'active' => true,
+                'is_system' => false,
+                'color' => 'green',
+            ],
+            [
                 'name' => 'Chauffeur Livreur',
                 'slug' => 'driver',
                 'description' => 'Livraison des commandes aux clients',
-                'level' => 60,
+                'level' => 40,
                 'active' => true,
                 'is_system' => false,
-                'color' => 'success',
+                'color' => 'green',
+            ],
+
+            // Superviseurs
+            [
+                'name' => 'Manager Superviseur',
+                'slug' => 'supervisor_manager',
+                'description' => 'Superviseur régional gérant plusieurs entités',
+                'level' => 85,
+                'active' => true,
+                'is_system' => false,
+                'color' => 'purple',
+            ],
+            [
+                'name' => 'Staff Superviseur',
+                'slug' => 'supervisor_staff',
+                'description' => 'Membre du staff de supervision',
+                'level' => 70,
+                'active' => true,
+                'is_system' => false,
+                'color' => 'purple',
             ],
 
             // Fournisseurs
@@ -187,5 +216,7 @@ class RoleSeeder extends Seeder
                 $roleData
             );
         }
+
+        $this->command->info('✅ Roles created/updated successfully');
     }
 }

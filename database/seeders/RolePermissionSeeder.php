@@ -99,6 +99,13 @@ class RolePermissionSeeder extends Seeder
                 'inventory.read',
                 'inventory.update',
                 'products.read',
+                'kitchens.read',
+                'kitchens.update',
+                'users.read',
+                'users.create',
+                'users.update',
+                'templates.read',
+                'templates.assign',
             ]);
         }
 
@@ -109,6 +116,21 @@ class RolePermissionSeeder extends Seeder
                 'kitchen.orders.read',
                 'kitchen.orders.prepare',
                 'inventory.read',
+                'kitchens.read',
+            ]);
+        }
+
+        // Driver Manager
+        $driverManager = Role::where('slug', 'driver_manager')->first();
+        if ($driverManager) {
+            $this->assignPermissions($driverManager, [
+                'drivers.read',
+                'drivers.create',
+                'drivers.update',
+                'drivers.delete',
+                'deliveries.read',
+                'deliveries.assign',
+                'deliveries.update',
             ]);
         }
 
@@ -119,6 +141,24 @@ class RolePermissionSeeder extends Seeder
                 'deliveries.read',
                 'deliveries.update',
                 'orders.read',
+                'drivers.read',
+            ]);
+        }
+
+        // Supervisor Manager
+        $supervisorManager = Role::where('slug', 'supervisor_manager')->first();
+        if ($supervisorManager) {
+            $this->assignPermissions($supervisorManager, [
+                'supervisors.*',
+                'shops.read',
+                'kitchens.read',
+                'drivers.read',
+                'users.read',
+                'users.create',
+                'users.update',
+                'templates.read',
+                'templates.create',
+                'templates.assign',
             ]);
         }
 
@@ -153,6 +193,8 @@ class RolePermissionSeeder extends Seeder
                 'products.read',
             ]);
         }
+
+        $this->command->info('✅ Role permissions assigned successfully');
     }
 
     /**

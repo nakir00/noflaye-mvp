@@ -35,6 +35,21 @@ class Shop extends Model implements HasName
         return $this->belongsToMany(User::class, 'shop_user')->withTimestamps();
     }
 
+    public function kitchens(): BelongsToMany
+    {
+        return $this->belongsToMany(Kitchen::class, 'shop_kitchen')->withTimestamps();
+    }
+
+    public function drivers(): BelongsToMany
+    {
+        return $this->belongsToMany(Driver::class, 'shop_driver')->withTimestamps();
+    }
+
+    public function supervisors(): BelongsToMany
+    {
+        return $this->belongsToMany(Supervisor::class, 'supervisor_shop')->withTimestamps();
+    }
+
     public function userGroups(): MorphMany
     {
         return $this->morphMany(UserGroup::class, 'groupable');

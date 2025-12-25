@@ -51,6 +51,7 @@ class HandleInertiaRequests extends Middleware
             'ziggy' => fn () => [
                 ...(new Ziggy)->toArray(),
             ],
+            'accessible_panels' => $request->user()?->getAccessiblePanels() ?? [],
         ]);
     }
 }

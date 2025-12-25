@@ -33,9 +33,17 @@ class PermissionSeeder extends Seeder
             ['name' => 'Livraisons', 'slug' => 'deliveries', 'description' => 'Gestion des livraisons'],
             ['name' => 'Analytics', 'slug' => 'analytics', 'description' => 'Rapports et analyses'],
             ['name' => 'Utilisateurs', 'slug' => 'users', 'description' => 'Gestion des utilisateurs'],
+            ['name' => 'Rôles', 'slug' => 'roles', 'description' => 'Gestion des rôles'],
+            ['name' => 'Permissions', 'slug' => 'permissions', 'description' => 'Gestion des permissions'],
+            ['name' => 'Groupes', 'slug' => 'groups', 'description' => 'Gestion des groupes'],
             ['name' => 'Paramètres', 'slug' => 'settings', 'description' => 'Configuration du système'],
             ['name' => 'Boutiques', 'slug' => 'shops', 'description' => 'Gestion des boutiques'],
+            ['name' => 'Cuisines', 'slug' => 'kitchens', 'description' => 'Gestion des cuisines'],
+            ['name' => 'Livreurs', 'slug' => 'drivers', 'description' => 'Gestion des livreurs'],
+            ['name' => 'Superviseurs', 'slug' => 'supervisors', 'description' => 'Gestion des superviseurs'],
             ['name' => 'Fournisseurs', 'slug' => 'suppliers', 'description' => 'Gestion des fournisseurs'],
+            ['name' => 'Templates', 'slug' => 'templates', 'description' => 'Templates de permissions'],
+            ['name' => 'Configurations Panels', 'slug' => 'panel_configurations', 'description' => 'Configuration des panels'],
         ];
 
         $groups = [];
@@ -333,6 +341,142 @@ class PermissionSeeder extends Seeder
                 'group' => 'suppliers',
                 'action_type' => 'update',
             ],
+
+            // Kitchens
+            [
+                'name' => 'Voir les cuisines',
+                'slug' => 'kitchens.read',
+                'description' => 'Consulter les cuisines',
+                'group' => 'kitchens',
+                'action_type' => 'read',
+            ],
+            [
+                'name' => 'Créer des cuisines',
+                'slug' => 'kitchens.create',
+                'description' => 'Ajouter de nouvelles cuisines',
+                'group' => 'kitchens',
+                'action_type' => 'create',
+            ],
+            [
+                'name' => 'Modifier les cuisines',
+                'slug' => 'kitchens.update',
+                'description' => 'Éditer les cuisines',
+                'group' => 'kitchens',
+                'action_type' => 'update',
+            ],
+            [
+                'name' => 'Supprimer les cuisines',
+                'slug' => 'kitchens.delete',
+                'description' => 'Supprimer les cuisines',
+                'group' => 'kitchens',
+                'action_type' => 'delete',
+            ],
+
+            // Drivers
+            [
+                'name' => 'Voir les livreurs',
+                'slug' => 'drivers.read',
+                'description' => 'Consulter les livreurs',
+                'group' => 'drivers',
+                'action_type' => 'read',
+            ],
+            [
+                'name' => 'Créer des livreurs',
+                'slug' => 'drivers.create',
+                'description' => 'Ajouter de nouveaux livreurs',
+                'group' => 'drivers',
+                'action_type' => 'create',
+            ],
+            [
+                'name' => 'Modifier les livreurs',
+                'slug' => 'drivers.update',
+                'description' => 'Éditer les livreurs',
+                'group' => 'drivers',
+                'action_type' => 'update',
+            ],
+            [
+                'name' => 'Supprimer les livreurs',
+                'slug' => 'drivers.delete',
+                'description' => 'Supprimer les livreurs',
+                'group' => 'drivers',
+                'action_type' => 'delete',
+            ],
+
+            // Supervisors
+            [
+                'name' => 'Voir les superviseurs',
+                'slug' => 'supervisors.read',
+                'description' => 'Consulter les superviseurs',
+                'group' => 'supervisors',
+                'action_type' => 'read',
+            ],
+            [
+                'name' => 'Créer des superviseurs',
+                'slug' => 'supervisors.create',
+                'description' => 'Ajouter de nouveaux superviseurs',
+                'group' => 'supervisors',
+                'action_type' => 'create',
+            ],
+            [
+                'name' => 'Modifier les superviseurs',
+                'slug' => 'supervisors.update',
+                'description' => 'Éditer les superviseurs',
+                'group' => 'supervisors',
+                'action_type' => 'update',
+            ],
+            [
+                'name' => 'Supprimer les superviseurs',
+                'slug' => 'supervisors.delete',
+                'description' => 'Supprimer les superviseurs',
+                'group' => 'supervisors',
+                'action_type' => 'delete',
+            ],
+
+            // Templates
+            [
+                'name' => 'Voir les templates',
+                'slug' => 'templates.read',
+                'description' => 'Consulter les templates',
+                'group' => 'templates',
+                'action_type' => 'read',
+            ],
+            [
+                'name' => 'Créer des templates',
+                'slug' => 'templates.create',
+                'description' => 'Créer de nouveaux templates',
+                'group' => 'templates',
+                'action_type' => 'create',
+            ],
+            [
+                'name' => 'Assigner des templates',
+                'slug' => 'templates.assign',
+                'description' => 'Assigner templates aux utilisateurs',
+                'group' => 'templates',
+                'action_type' => 'create',
+            ],
+            [
+                'name' => 'Définir template par défaut',
+                'slug' => 'templates.default.set',
+                'description' => 'Définir template par défaut',
+                'group' => 'templates',
+                'action_type' => 'update',
+            ],
+
+            // Panel Configurations
+            [
+                'name' => 'Voir les configurations panels',
+                'slug' => 'panel_configurations.read',
+                'description' => 'Consulter configurations panels',
+                'group' => 'panel_configurations',
+                'action_type' => 'read',
+            ],
+            [
+                'name' => 'Modifier les configurations panels',
+                'slug' => 'panel_configurations.update',
+                'description' => 'Modifier configurations panels',
+                'group' => 'panel_configurations',
+                'action_type' => 'update',
+            ],
         ];
 
         foreach ($permissions as $permData) {
@@ -349,5 +493,7 @@ class PermissionSeeder extends Seeder
                 ])
             );
         }
+
+        $this->command->info('✅ Permissions created successfully');
     }
 }

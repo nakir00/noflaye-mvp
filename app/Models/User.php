@@ -97,6 +97,21 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         return $this->belongsToMany(Supplier::class, 'supplier_user')->withTimestamps();
     }
 
+    public function supervisors(): BelongsToMany
+    {
+        return $this->belongsToMany(Supervisor::class, 'supervisor_user')->withTimestamps();
+    }
+
+    public function kitchens(): BelongsToMany
+    {
+        return $this->belongsToMany(Kitchen::class, 'kitchen_user')->withTimestamps();
+    }
+
+    public function drivers(): BelongsToMany
+    {
+        return $this->belongsToMany(Driver::class, 'driver_user')->withTimestamps();
+    }
+
     public function userGroups(): BelongsToMany
     {
         return $this->belongsToMany(UserGroup::class, 'user_group_members')
@@ -191,26 +206,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants
 
         return match ($panelId) {
             'admin' => $this->hasAnyRole(['super_admin', 'admin']),
-
-            'shop' => $this->hasAnyRole([
-                'shop_manager',
-                'shop_manager_senior',
-                'shop_manager_junior',
-                'shop_manager_trainee'
-            ]) || $this->shops()->exists(),
-
-            'kitchen' => $this->hasAnyRole([
-                'kitchen_manager',
-                'kitchen_staff'
-            ]) || $this->shops()->exists(),
-
-            'driver' => $this->hasRole('driver'),
-
-            'supplier' => $this->hasAnyRole([
-                'supplier_manager',
-                'supplier_staff'
-            ]) || $this->suppliers()->exists(),
-
+            'shop' => $this->hasAnyRole(['shop_manager', 'shop_staff']) || $this->shops()->exists(),
+            'kitchen' => $this->hasAnyRole(['kitchen_manager', 'kitchen_staff']) || $this->kitchens()->exists(),
+            'driver' => $this->hasRole('driver') || $this->drivers()->exists(),
+            'supplier' => $this->hasAnyRole(['supplier_manager', 'supplier_staff']) || $this->suppliers()->exists(),
+            'supervisor' => $this->hasAnyRole(['supervisor_manager', 'supervisor_staff']) || $this->supervisors()->exists(),
             default => false,
         };
     }
@@ -219,37 +219,41 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     {
         $panelId = $panel->getId();
 
-        // Super Admin et Admin voient tout
-        if ($this->hasAnyRole(['super_admin', 'admin'])) {
-            return match ($panelId) {
-                'shop', 'kitchen' => Shop::all(),
-                'supplier' => Supplier::all(),
-                default => collect(),
-            };
-        }
-
-        // Autres utilisateurs voient leurs tenants
         return match ($panelId) {
-            'shop', 'kitchen' => $this->shops,
-            'supplier' => $this->suppliers,
-            default => collect(),
+            'admin' => collect([]),
+            'shop' => $this->hasAnyRole(['super_admin', 'admin']) ? Shop::all() : $this->shops,
+            'kitchen' => $this->hasAnyRole(['super_admin', 'admin']) ? Kitchen::all() : $this->kitchens,
+            'driver' => $this->hasAnyRole(['super_admin', 'admin']) ? Driver::all() : $this->drivers,
+            'supplier' => $this->hasAnyRole(['super_admin', 'admin']) ? Supplier::all() : $this->suppliers,
+            'supervisor' => $this->hasAnyRole(['super_admin', 'admin']) ? Supervisor::all() : $this->supervisors,
+            default => collect([]),
         };
     }
 
     public function canAccessTenant(Model $tenant): bool
     {
-        // Super Admin et Admin peuvent tout voir
         if ($this->hasAnyRole(['super_admin', 'admin'])) {
             return true;
         }
 
-        // Vérifier si l'utilisateur gère ce tenant
         if ($tenant instanceof Shop) {
             return $this->managesShop($tenant->id);
         }
 
+        if ($tenant instanceof Kitchen) {
+            return $this->managesKitchen($tenant->id);
+        }
+
+        if ($tenant instanceof Driver) {
+            return $this->managesDriver($tenant->id);
+        }
+
         if ($tenant instanceof Supplier) {
             return $this->managesSupplier($tenant->id);
+        }
+
+        if ($tenant instanceof Supervisor) {
+            return $this->managesSupervisor($tenant->id);
         }
 
         return false;
@@ -327,6 +331,84 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         return Supplier::whereIn('id', $allSupplierIds)->get();
     }
 
+    /**
+     * Récupère tous les superviseurs gérés
+     */
+    public function getManagedSupervisors(): Collection
+    {
+        if ($this->hasAnyRole(['super_admin', 'admin'])) {
+            return Supervisor::all();
+        }
+
+        $direct = $this->supervisors()->pluck('supervisors.id');
+        $scoped = $this->roles()
+            ->wherePivot('scope_type', 'supervisor')
+            ->pluck('user_roles.scope_id')
+            ->filter();
+
+        return Supervisor::whereIn('id', $direct->merge($scoped)->unique())->get();
+    }
+
+    /**
+     * Récupère toutes les cuisines gérées
+     */
+    public function getManagedKitchens(): Collection
+    {
+        if ($this->hasAnyRole(['super_admin', 'admin'])) {
+            return Kitchen::all();
+        }
+
+        $direct = $this->kitchens()->pluck('kitchens.id');
+        $scoped = $this->roles()
+            ->wherePivot('scope_type', 'kitchen')
+            ->pluck('user_roles.scope_id')
+            ->filter();
+
+        return Kitchen::whereIn('id', $direct->merge($scoped)->unique())->get();
+    }
+
+    /**
+     * Récupère tous les chauffeurs gérés
+     */
+    public function getManagedDrivers(): Collection
+    {
+        if ($this->hasAnyRole(['super_admin', 'admin'])) {
+            return Driver::all();
+        }
+
+        $direct = $this->drivers()->pluck('drivers.id');
+        $scoped = $this->roles()
+            ->wherePivot('scope_type', 'driver')
+            ->pluck('user_roles.scope_id')
+            ->filter();
+
+        return Driver::whereIn('id', $direct->merge($scoped)->unique())->get();
+    }
+
+    /**
+     * Vérifie si l'utilisateur gère un superviseur
+     */
+    public function managesSupervisor(int $id): bool
+    {
+        return $this->getManagedSupervisors()->contains('id', $id);
+    }
+
+    /**
+     * Vérifie si l'utilisateur gère une cuisine
+     */
+    public function managesKitchen(int $id): bool
+    {
+        return $this->getManagedKitchens()->contains('id', $id);
+    }
+
+    /**
+     * Vérifie si l'utilisateur gère un chauffeur
+     */
+    public function managesDriver(int $id): bool
+    {
+        return $this->getManagedDrivers()->contains('id', $id);
+    }
+
     // ═══════════════════════════════════════════════════════
     // PANEL SWITCHER
     // ═══════════════════════════════════════════════════════
@@ -338,60 +420,110 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     public function getAccessiblePanels(): array
     {
         $panels = [];
-        $roleSlugs = $this->getRoleSlugs();
 
         // Admin Panel
-        if (array_intersect(['super_admin', 'admin'], $roleSlugs)) {
+        if ($this->hasAnyRole(['super_admin', 'admin'])) {
             $panels[] = [
                 'id' => 'admin',
                 'name' => 'Administration',
                 'url' => '/admin',
                 'icon' => 'heroicon-o-shield-check',
                 'color' => 'danger',
+                'entities' => [],
             ];
         }
 
         // Shop Panel
-        if (array_intersect(['shop_manager', 'shop_manager_senior', 'shop_manager_junior', 'shop_manager_trainee'], $roleSlugs) || $this->shops()->exists()) {
+        $managedShops = $this->getManagedShops();
+        if ($managedShops->isNotEmpty() || $this->hasAnyRole(['shop_manager', 'shop_staff'])) {
             $panels[] = [
                 'id' => 'shop',
-                'name' => 'Gestion Boutique',
+                'name' => 'Boutiques',
                 'url' => '/shop',
                 'icon' => 'heroicon-o-building-storefront',
                 'color' => 'primary',
+                'entities' => $managedShops->map(fn($shop) => [
+                    'id' => $shop->id,
+                    'name' => $shop->name,
+                    'url' => "/shop/{$shop->slug}",
+                    'linked_kitchens' => $shop->kitchens->pluck('name')->toArray(),
+                    'linked_drivers' => $shop->drivers->pluck('name')->toArray(),
+                ])->toArray(),
             ];
         }
 
         // Kitchen Panel
-        if (array_intersect(['kitchen_manager', 'kitchen_staff'], $roleSlugs) || $this->shops()->exists()) {
+        $managedKitchens = $this->getManagedKitchens();
+        if ($managedKitchens->isNotEmpty() || $this->hasAnyRole(['kitchen_manager', 'kitchen_staff'])) {
             $panels[] = [
                 'id' => 'kitchen',
-                'name' => 'Cuisine',
+                'name' => 'Cuisines',
                 'url' => '/kitchen',
                 'icon' => 'heroicon-o-fire',
                 'color' => 'warning',
+                'entities' => $managedKitchens->map(fn($kitchen) => [
+                    'id' => $kitchen->id,
+                    'name' => $kitchen->name,
+                    'url' => "/kitchen/{$kitchen->slug}",
+                    'linked_shops' => $kitchen->shops->pluck('name')->toArray(),
+                    'linked_drivers' => $kitchen->drivers->pluck('name')->toArray(),
+                ])->toArray(),
             ];
         }
 
         // Driver Panel
-        if (in_array('driver', $roleSlugs)) {
+        $managedDrivers = $this->getManagedDrivers();
+        if ($managedDrivers->isNotEmpty() || $this->hasRole('driver')) {
             $panels[] = [
                 'id' => 'driver',
-                'name' => 'Livraison',
+                'name' => 'Livraisons',
                 'url' => '/driver',
                 'icon' => 'heroicon-o-truck',
                 'color' => 'success',
+                'entities' => $managedDrivers->map(fn($driver) => [
+                    'id' => $driver->id,
+                    'name' => $driver->name,
+                    'url' => "/driver/{$driver->slug}",
+                    'linked_shops' => $driver->shops->pluck('name')->toArray(),
+                    'linked_kitchens' => $driver->kitchens->pluck('name')->toArray(),
+                ])->toArray(),
             ];
         }
 
         // Supplier Panel
-        if (array_intersect(['supplier_manager', 'supplier_staff'], $roleSlugs) || $this->suppliers()->exists()) {
+        $managedSuppliers = $this->getManagedSuppliers();
+        if ($managedSuppliers->isNotEmpty() || $this->hasAnyRole(['supplier_manager', 'supplier_staff'])) {
             $panels[] = [
                 'id' => 'supplier',
-                'name' => 'Fournisseur',
+                'name' => 'Fournisseurs',
                 'url' => '/supplier',
                 'icon' => 'heroicon-o-cube',
                 'color' => 'info',
+                'entities' => $managedSuppliers->map(fn($supplier) => [
+                    'id' => $supplier->id,
+                    'name' => $supplier->name,
+                    'url' => "/supplier/{$supplier->slug}",
+                ])->toArray(),
+            ];
+        }
+
+        // Supervisor Panel
+        $managedSupervisors = $this->getManagedSupervisors();
+        if ($managedSupervisors->isNotEmpty() || $this->hasAnyRole(['supervisor_manager', 'supervisor_staff'])) {
+            $panels[] = [
+                'id' => 'supervisor',
+                'name' => 'Supervision',
+                'url' => '/supervisor',
+                'icon' => 'heroicon-o-eye',
+                'color' => 'purple',
+                'entities' => $managedSupervisors->map(fn($supervisor) => [
+                    'id' => $supervisor->id,
+                    'name' => $supervisor->name,
+                    'url' => "/supervisor/{$supervisor->slug}",
+                    'linked_shops' => $supervisor->shops->pluck('name')->toArray(),
+                    'linked_kitchens' => $supervisor->kitchens->pluck('name')->toArray(),
+                    'linked_drivers' => $supervisor->drivers->pluck('name')->toArray(),
+                ])->toArray(),
             ];
         }
 
