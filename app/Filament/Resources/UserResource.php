@@ -120,12 +120,13 @@ class UserResource extends Resource
         return [
             RelationManagers\RolesRelationManager::class,
             RelationManagers\PermissionsRelationManager::class,
+            RelationManagers\TemplatesRelationManager::class,
+            RelationManagers\DelegationsRelationManager::class,
             RelationManagers\ShopsRelationManager::class,
             RelationManagers\KitchensRelationManager::class,
             RelationManagers\DriversRelationManager::class,
             RelationManagers\SuppliersRelationManager::class,
             RelationManagers\SupervisorsRelationManager::class,
-            RelationManagers\UserGroupsRelationManager::class,
         ];
     }
 
