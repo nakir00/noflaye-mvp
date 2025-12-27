@@ -3,6 +3,15 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Services\Permissions\PermissionChecker;
+use App\Services\Permissions\ScopeManager;
+use App\Services\Permissions\WildcardExpander;
+use App\Services\Permissions\ConditionEvaluator;
+use App\Services\Permissions\PermissionAuditLogger;
+use App\Services\Permissions\PermissionDelegator;
+use App\Services\Permissions\TemplateVersionManager;
+use App\Services\Permissions\PermissionAnalytics;
+use App\Services\Permissions\PermissionApprovalWorkflow;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +20,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Register permission services as singletons
+        $this->app->singleton(ScopeManager::class);
+        $this->app->singleton(WildcardExpander::class);
+        $this->app->singleton(ConditionEvaluator::class);
+        $this->app->singleton(PermissionChecker::class);
+        $this->app->singleton(PermissionAuditLogger::class);
+        $this->app->singleton(PermissionDelegator::class);
+        $this->app->singleton(TemplateVersionManager::class);
+        $this->app->singleton(PermissionAnalytics::class);
+        $this->app->singleton(PermissionApprovalWorkflow::class);
     }
 
     /**
@@ -19,6 +37,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Boot observers
+        $this->bootObservers();
+    }
+
+    /**
+     * Boot model observers
+     */
+    private function bootObservers(): void
+    {
+        \App\Models\UserGroup::observe(\App\Observers\UserGroupObserver::class);
+        \App\Models\PermissionTemplate::observe(\App\Observers\PermissionTemplateObserver::class);
+        \App\Models\PermissionGroup::observe(\App\Observers\PermissionGroupObserver::class);
+        \App\Models\Permission::observe(\App\Observers\PermissionObserver::class);
+        \App\Models\User::observe(\App\Observers\UserPermissionObserver::class);
     }
 }

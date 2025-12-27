@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
@@ -23,6 +24,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         'email',
         'password',
         'primary_role_id',
+        'primary_template_id',
     ];
 
     protected $hidden = [
@@ -35,6 +37,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'primary_template_id' => 'integer',
         ];
     }
 
@@ -117,6 +120,39 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         return $this->belongsToMany(UserGroup::class, 'user_group_members')
             ->withPivot(['scope_type', 'scope_id', 'valid_from', 'valid_until', 'assigned_by'])
             ->withTimestamps();
+    }
+
+    public function primaryTemplate(): BelongsTo
+    {
+        return $this->belongsTo(PermissionTemplate::class, 'primary_template_id');
+    }
+
+    public function templates(): BelongsToMany
+    {
+        return $this->belongsToMany(PermissionTemplate::class, 'user_templates')
+            ->withPivot('scope_id', 'template_version', 'auto_upgrade', 'auto_sync', 'valid_from', 'valid_until')
+            ->withTimestamps();
+    }
+
+    public function delegationsGiven(): HasMany
+    {
+        return $this->hasMany(PermissionDelegation::class, 'delegator_id');
+    }
+
+    public function delegationsReceived(): HasMany
+    {
+        return $this->hasMany(PermissionDelegation::class, 'delegatee_id');
+    }
+
+    public function permissionRequests(): HasMany
+    {
+        return $this->hasMany(PermissionRequest::class);
+    }
+
+    public function scopes(): HasMany
+    {
+        return $this->hasMany(Scope::class, 'scopable_id')
+            ->where('scopable_type', self::class);
     }
 
     // ═══════════════════════════════════════════════════════
