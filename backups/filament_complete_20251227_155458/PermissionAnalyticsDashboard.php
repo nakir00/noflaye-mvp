@@ -18,7 +18,7 @@ class PermissionAnalyticsDashboard extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected string $view = 'filament.pages.permission-analytics-dashboard';
+    protected static string $view = 'filament.pages.permission-analytics-dashboard';
 
     protected static string|UnitEnum|null $navigationGroup = 'Permissions';
 

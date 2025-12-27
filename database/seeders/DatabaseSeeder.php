@@ -2,12 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
-use App\Models\Shop;
-use App\Models\Supplier;
-use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,9 +11,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // Ordre d'exécution important
             PermissionSeeder::class,
-            RoleSeeder::class,
-            RolePermissionSeeder::class,
-            DefaultPermissionTemplateSeeder::class,
             PanelConfigurationSeeder::class,
             MultiPanelUserSeeder::class,
         ]);

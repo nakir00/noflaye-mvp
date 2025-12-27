@@ -15,7 +15,7 @@ use Filament\Widgets\ChartWidget;
  */
 class TemplateAdoptionWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Template Adoption';
+    protected ?string $heading = 'Template Adoption';
 
     protected static ?int $sort = 4;
 

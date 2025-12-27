@@ -8,8 +8,6 @@ use App\Services\Permissions\PermissionDelegator;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -33,12 +31,12 @@ class PermissionDelegationResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
-            ->components([
-                Section::make('Delegation Information')
-                    ->components([
+            ->schema([
+                Forms\Components\Section::make('Delegation Information')
+                    ->schema([
                         Forms\Components\Select::make('delegator_id')
                             ->label('Delegator')
                             ->relationship('delegator', 'name')
@@ -72,8 +70,8 @@ class PermissionDelegationResource extends Resource
                     ])
                     ->columns(2),
 
-                Section::make('Validity Period')
-                    ->components([
+                Forms\Components\Section::make('Validity Period')
+                    ->schema([
                         Forms\Components\DateTimePicker::make('valid_from')
                             ->required()
                             ->default(now())
@@ -86,8 +84,8 @@ class PermissionDelegationResource extends Resource
                     ])
                     ->columns(2),
 
-                Section::make('Re-delegation Options')
-                    ->components([
+                Forms\Components\Section::make('Re-delegation Options')
+                    ->schema([
                         Forms\Components\Toggle::make('can_redelegate')
                             ->label('Can Re-delegate')
                             ->default(false)
@@ -103,8 +101,8 @@ class PermissionDelegationResource extends Resource
                     ])
                     ->columns(2),
 
-                Section::make('Additional Information')
-                    ->components([
+                Forms\Components\Section::make('Additional Information')
+                    ->schema([
                         Forms\Components\Textarea::make('reason')
                             ->required()
                             ->maxLength(65535)

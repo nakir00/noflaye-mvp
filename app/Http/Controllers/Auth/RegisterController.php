@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Role;
+use App\Models\PermissionTemplate;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,24 +34,22 @@ class RegisterController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        // Créer l'utilisateur avec le rôle customer par défaut
-        $customerRole = Role::where('slug', 'customer')->first();
+        // Créer l'utilisateur avec le template customer par défaut
+        $customerTemplate = PermissionTemplate::where('slug', 'customer')
+            ->where('is_active', true)
+            ->first();
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'primary_role_id' => $customerRole?->id,
+            'primary_template_id' => $customerTemplate?->id,
         ]);
 
-        // Attacher le rôle customer à l'utilisateur
-        if ($customerRole) {
-            $user->roles()->attach($customerRole->id, [
-                'scope_type' => null,
-                'scope_id' => null,
-                'valid_from' => now(),
-                'valid_until' => null,
-                'granted_by' => null,
+        // Attacher le template customer à l'utilisateur
+        if ($customerTemplate) {
+            $user->templates()->attach($customerTemplate->id, [
+                'auto_sync' => true,
             ]);
         }
 

@@ -2,21 +2,24 @@
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class MyPermissions extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-lock-closed';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-lock-closed';
 
-    protected static string $view = 'filament.pages.my-permissions';
+    protected string $view = 'filament.pages.my-permissions';
 
-    protected static ?string $navigationGroup = 'My Account';
+    protected static string|UnitEnum|null $navigationGroup = 'My Account';
 
     protected static ?string $title = 'My Permissions';
 
     public function getViewData(): array
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         return [
             'user' => $user,

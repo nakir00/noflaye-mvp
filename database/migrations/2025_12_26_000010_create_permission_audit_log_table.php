@@ -5,13 +5,16 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * Migration: Create permission_audit_log table
+ * Migration: Create permission_audit_logs table
  *
  * Purpose: Comprehensive audit trail for permission changes
  * Features: Who, what, when, where, why tracking with full metadata
  *
+ * CORRECTION: Table name changed from 'permission_audit_log' (singular) to 'permission_audit_logs' (plural)
+ * Reason: Laravel convention uses plural table names, Model expects 'permission_audit_logs'
+ *
  * @author Noflaye Box Team
- * @version 1.0.0
+ * @version 1.0.1
  */
 return new class extends Migration
 {
@@ -20,7 +23,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('permission_audit_log', function (Blueprint $table) {
+        Schema::create('permission_audit_logs', function (Blueprint $table) {
             $table->id();
 
             // Who was affected?
@@ -70,6 +73,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('permission_audit_log');
+        Schema::dropIfExists('permission_audit_logs');
     }
 };

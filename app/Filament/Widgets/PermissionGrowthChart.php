@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
  */
 class PermissionGrowthChart extends ChartWidget
 {
-    protected static ?string $heading = 'Permission Assignments Growth';
+    protected ?string $heading = 'Permission Assignments Growth';
 
     protected static ?int $sort = 2;
 

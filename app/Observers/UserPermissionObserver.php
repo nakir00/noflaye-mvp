@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Permission;
 use App\Services\Permissions\PermissionAuditLogger;
 use App\Services\Permissions\PermissionChecker;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -47,7 +48,7 @@ class UserPermissionObserver
             $user,
             $permission,
             $scope,
-            auth()->user() ?? $user,
+            Auth::user() ?? $user,
             $pivotData['reason'] ?? null,
             $pivotData['source'] ?? 'direct'
         );
@@ -81,7 +82,7 @@ class UserPermissionObserver
         $this->auditLogger->logRevoke(
             $user,
             $permission,
-            auth()->user() ?? $user
+            Auth::user() ?? $user
         );
 
         // Invalidate user cache

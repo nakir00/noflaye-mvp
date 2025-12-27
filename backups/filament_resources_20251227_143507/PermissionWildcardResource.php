@@ -8,8 +8,6 @@ use App\Services\Permissions\WildcardExpander;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -33,12 +31,12 @@ class PermissionWildcardResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
-            ->components([
-                Section::make('Wildcard Information')
-                    ->components([
+            ->schema([
+                Forms\Components\Section::make('Wildcard Information')
+                    ->schema([
                         Forms\Components\TextInput::make('pattern')
                             ->required()
                             ->maxLength(255)
@@ -61,8 +59,8 @@ class PermissionWildcardResource extends Resource
                     ])
                     ->columns(2),
 
-                Section::make('Appearance')
-                    ->components([
+                Forms\Components\Section::make('Appearance')
+                    ->schema([
                         Forms\Components\TextInput::make('icon')
                             ->default('heroicon-o-sparkles'),
 
@@ -75,8 +73,8 @@ class PermissionWildcardResource extends Resource
                     ])
                     ->columns(3),
 
-                Section::make('Options')
-                    ->components([
+                Forms\Components\Section::make('Options')
+                    ->schema([
                         Forms\Components\Toggle::make('is_active')
                             ->default(true),
 

@@ -7,8 +7,6 @@ use App\Models\PermissionTemplate;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -32,12 +30,12 @@ class PermissionTemplateResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
-            ->components([
-                Section::make('Basic Information')
-                    ->components([
+            ->schema([
+                Forms\Components\Section::make('Basic Information')
+                    ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255)
@@ -58,8 +56,8 @@ class PermissionTemplateResource extends Resource
                     ])
                     ->columns(2),
 
-                Section::make('Hierarchy & Scope')
-                    ->components([
+                Forms\Components\Section::make('Hierarchy & Scope')
+                    ->schema([
                         Forms\Components\Select::make('parent_id')
                             ->label('Parent Template')
                             ->relationship('parent', 'name')
@@ -74,8 +72,8 @@ class PermissionTemplateResource extends Resource
                     ])
                     ->columns(2),
 
-                Section::make('Appearance')
-                    ->components([
+                Forms\Components\Section::make('Appearance')
+                    ->schema([
                         Forms\Components\ColorPicker::make('color')
                             ->required()
                             ->default('#3B82F6'),
@@ -93,8 +91,8 @@ class PermissionTemplateResource extends Resource
                     ])
                     ->columns(3),
 
-                Section::make('Permissions')
-                    ->components([
+                Forms\Components\Section::make('Permissions')
+                    ->schema([
                         Forms\Components\CheckboxList::make('permissions')
                             ->relationship('permissions', 'name')
                             ->searchable()
@@ -102,8 +100,8 @@ class PermissionTemplateResource extends Resource
                             ->columns(3),
                     ]),
 
-                Section::make('Wildcards')
-                    ->components([
+                Forms\Components\Section::make('Wildcards')
+                    ->schema([
                         Forms\Components\CheckboxList::make('wildcards')
                             ->relationship('wildcards', 'pattern')
                             ->searchable()
@@ -111,8 +109,8 @@ class PermissionTemplateResource extends Resource
                             ->columns(3),
                     ]),
 
-                Section::make('Options')
-                    ->components([
+                Forms\Components\Section::make('Options')
+                    ->schema([
                         Forms\Components\Toggle::make('is_active')
                             ->label('Active')
                             ->default(true)

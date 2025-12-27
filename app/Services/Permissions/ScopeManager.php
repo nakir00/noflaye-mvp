@@ -139,7 +139,7 @@ class ScopeManager
     {
         $modelClass = $this->getModelClass($type);
 
-        $query = Scope::where('scopable_type', $modelClass);
+        $query = Scope::query()->where('scopable_type', $modelClass);
 
         if ($activeOnly) {
             $query->active();

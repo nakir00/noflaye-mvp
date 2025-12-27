@@ -8,8 +8,6 @@ use App\Services\Permissions\PermissionApprovalWorkflow;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -33,12 +31,12 @@ class PermissionRequestResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
-            ->components([
-                Section::make('Request Information')
-                    ->components([
+            ->schema([
+                Forms\Components\Section::make('Request Information')
+                    ->schema([
                         Forms\Components\Select::make('user_id')
                             ->label('Requester')
                             ->relationship('user', 'name')
@@ -64,8 +62,8 @@ class PermissionRequestResource extends Resource
                     ])
                     ->columns(2),
 
-                Section::make('Request Details')
-                    ->components([
+                Forms\Components\Section::make('Request Details')
+                    ->schema([
                         Forms\Components\Textarea::make('reason')
                             ->label('Request Reason')
                             ->required()
@@ -83,8 +81,8 @@ class PermissionRequestResource extends Resource
                             ->disabled(),
                     ]),
 
-                Section::make('Validity Period')
-                    ->components([
+                Forms\Components\Section::make('Validity Period')
+                    ->schema([
                         Forms\Components\DateTimePicker::make('requested_from')
                             ->label('Valid From')
                             ->default(now())
@@ -97,8 +95,8 @@ class PermissionRequestResource extends Resource
                     ])
                     ->columns(2),
 
-                Section::make('Review Information')
-                    ->components([
+                Forms\Components\Section::make('Review Information')
+                    ->schema([
                         Forms\Components\Select::make('reviewed_by')
                             ->label('Reviewed By')
                             ->relationship('reviewer', 'name')

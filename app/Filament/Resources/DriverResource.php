@@ -98,12 +98,12 @@ class DriverResource extends Resource
                 TernaryFilter::make('is_active'),
                 TernaryFilter::make('is_available'),
             ])
-            ->actions([
+            ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

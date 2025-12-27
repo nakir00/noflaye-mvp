@@ -127,7 +127,7 @@ class PermissionsRelationManager extends RelationManager
             ->headerActions([
                 AttachAction::make()
                     ->preloadRecordSelect()
-                    ->schema(fn (AttachAction $action): array => [
+                    ->form(fn (AttachAction $action): array => [
                         $action->getRecordSelect(),
                         Forms\Components\Select::make('scope_id')
                             ->label('Scope')

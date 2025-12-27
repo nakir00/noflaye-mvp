@@ -1,61 +1,65 @@
 <?php
 
-namespace App\Filament\Resources\UserResource\RelationManagers;
+namespace App\Filament\Pages;
 
 use App\Models\PermissionDelegation;
+use App\Services\Permissions\PermissionDelegator;
+use BackedEnum;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
+use Filament\Pages\Page;
 use Filament\Tables;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 /**
- * DelegationsRelationManager
+ * MyDelegations Page
  *
- * View user delegations received (readonly)
+ * User's delegations (received and given)
  *
  * @author Noflaye Box Team
  * @version 1.0.0
  */
-class DelegationsRelationManager extends RelationManager
+class MyDelegations extends Page implements HasTable
 {
-    protected static string $relationship = 'delegationsReceived';
+    use InteractsWithTable;
 
-    protected static ?string $title = 'Delegations Received';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-arrow-right-circle';
+
+    protected static string $view = 'filament.pages.my-delegations';
+
+    protected static string|UnitEnum|null $navigationGroup = 'Permissions';
+
+    protected static ?int $navigationSort = 6;
+
+    protected static ?string $title = 'My Delegations';
 
     /**
-     * Form (not used - readonly)
-     */
-    public function form(Schema $form): Schema
-    {
-        return $form->component([]);
-    }
-
-    /**
-     * Table for viewing delegations
+     * Table for received delegations
      */
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('permission.name')
+            ->query(
+                PermissionDelegation::query()
+                    ->where('delegatee_id', Auth::id())
+                    ->orderBy('created_at', 'desc')
+            )
             ->columns([
                 Tables\Columns\TextColumn::make('delegator.name')
                     ->label('Delegated By')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
 
                 Tables\Columns\TextColumn::make('permission.name')
                     ->label('Permission')
-                    ->searchable()
-                    ->sortable()
                     ->limit(30),
 
                 Tables\Columns\TextColumn::make('scope.name')
                     ->label('Scope')
-                    ->searchable()
                     ->placeholder('Global'),
 
                 Tables\Columns\TextColumn::make('status')
@@ -76,16 +80,10 @@ class DelegationsRelationManager extends RelationManager
                     }),
 
                 Tables\Columns\TextColumn::make('valid_until')
-                    ->dateTime()
-                    ->sortable(),
+                    ->dateTime(),
 
                 Tables\Columns\IconColumn::make('can_redelegate')
                     ->boolean(),
-
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
@@ -96,13 +94,11 @@ class DelegationsRelationManager extends RelationManager
                     ])
                     ->query(function (Builder $query, $state) {
                         if ($state['value'] === 'active') {
-                            return $query->where('valid_until', '>', now())
-                                ->whereNull('revoked_at');
+                            return $query->active();
                         } elseif ($state['value'] === 'expired') {
-                            return $query->where('valid_until', '<=', now())
-                                ->whereNull('revoked_at');
+                            return $query->expired();
                         } elseif ($state['value'] === 'revoked') {
-                            return $query->whereNotNull('revoked_at');
+                            return $query->revoked();
                         }
                     }),
             ])
@@ -114,5 +110,16 @@ class DelegationsRelationManager extends RelationManager
                         ['record' => $record],
                     )),
             ]);
+    }
+
+    /**
+     * Get given delegations
+     */
+    public function getGivenDelegations()
+    {
+        return PermissionDelegation::where('delegator_id', Auth::id())
+            ->with(['delegatee', 'permission', 'scope'])
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 }

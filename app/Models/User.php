@@ -23,7 +23,6 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         'name',
         'email',
         'password',
-        'primary_role_id',
         'primary_template_id',
     ];
 
@@ -45,28 +44,21 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     // RELATIONS
     // ═══════════════════════════════════════════════════════
 
-    public function primaryRole(): BelongsTo
+    /**
+     * Template principal de l'utilisateur
+     */
+    public function primaryTemplate(): BelongsTo
     {
-        return $this->belongsTo(Role::class, 'primary_role_id');
+        return $this->belongsTo(PermissionTemplate::class, 'primary_template_id');
     }
 
     /**
-     * Tous les rôles de l'utilisateur (multi-rôles)
+     * Templates assignés à l'utilisateur
      */
-    public function roles(): BelongsToMany
+    public function templates(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'user_roles')
-            ->withPivot(['scope_type', 'scope_id', 'valid_from', 'valid_until', 'granted_by'])
-            ->where(function ($query) {
-                $query->where(function ($q) {
-                    $q->whereNull('user_roles.valid_until')
-                      ->orWhere('user_roles.valid_until', '>', now());
-                })
-                ->where(function ($q) {
-                    $q->whereNull('user_roles.valid_from')
-                      ->orWhere('user_roles.valid_from', '<=', now());
-                });
-            })
+        return $this->belongsToMany(PermissionTemplate::class, 'user_templates')
+            ->withPivot('scope_id', 'template_version', 'auto_upgrade', 'auto_sync', 'valid_from', 'valid_until')
             ->withTimestamps();
     }
 
@@ -76,17 +68,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'user_permissions')
-            ->withPivot(['permission_type', 'scope_type', 'scope_id', 'valid_from', 'valid_until', 'granted_by', 'reason'])
-            ->where(function ($query) {
-                $query->where(function ($q) {
-                    $q->whereNull('user_permissions.valid_until')
-                      ->orWhere('user_permissions.valid_until', '>', now());
-                })
-                ->where(function ($q) {
-                    $q->whereNull('user_permissions.valid_from')
-                      ->orWhere('user_permissions.valid_from', '<=', now());
-                });
-            })
+            ->withPivot(['scope_id', 'expires_at', 'source', 'source_id', 'conditions'])
             ->withTimestamps();
     }
 
@@ -118,19 +100,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     public function userGroups(): BelongsToMany
     {
         return $this->belongsToMany(UserGroup::class, 'user_group_members')
-            ->withPivot(['scope_type', 'scope_id', 'valid_from', 'valid_until', 'assigned_by'])
-            ->withTimestamps();
-    }
-
-    public function primaryTemplate(): BelongsTo
-    {
-        return $this->belongsTo(PermissionTemplate::class, 'primary_template_id');
-    }
-
-    public function templates(): BelongsToMany
-    {
-        return $this->belongsToMany(PermissionTemplate::class, 'user_templates')
-            ->withPivot('scope_id', 'template_version', 'auto_upgrade', 'auto_sync', 'valid_from', 'valid_until')
+            ->withPivot(['scope_id'])
             ->withTimestamps();
     }
 
@@ -156,48 +126,79 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     }
 
     // ═══════════════════════════════════════════════════════
-    // VÉRIFICATION RÔLES
+    // VÉRIFICATION TEMPLATES
     // ═══════════════════════════════════════════════════════
 
     /**
-     * Vérifie si l'utilisateur a un rôle spécifique
+     * Vérifie si l'utilisateur a un template spécifique
      */
-    public function hasRole(string $roleSlug): bool
+    public function hasTemplate(string $templateSlug): bool
     {
-        return $this->roles()->where('slug', $roleSlug)->exists() ||
-               $this->primaryRole?->slug === $roleSlug;
+        return $this->primaryTemplate?->slug === $templateSlug
+            || $this->templates->contains('slug', $templateSlug);
     }
 
     /**
-     * Vérifie si l'utilisateur a AU MOINS UN des rôles
+     * Vérifie si l'utilisateur a AU MOINS UN des templates
      */
-    public function hasAnyRole(array $roleSlugs): bool
+    public function hasAnyTemplate(array $templateSlugs): bool
     {
-        return $this->roles()->whereIn('slug', $roleSlugs)->exists() ||
-               ($this->primaryRole && in_array($this->primaryRole->slug, $roleSlugs));
+        if ($this->primaryTemplate && in_array($this->primaryTemplate->slug, $templateSlugs)) {
+            return true;
+        }
+
+        return $this->templates->whereIn('slug', $templateSlugs)->isNotEmpty();
     }
 
     /**
-     * Vérifie si l'utilisateur a TOUS les rôles
+     * Vérifie si l'utilisateur a TOUS les templates
      */
-    public function hasAllRoles(array $roleSlugs): bool
+    public function hasAllTemplates(array $templateSlugs): bool
     {
-        $userRoles = $this->getRoleSlugs();
-        return count(array_intersect($roleSlugs, $userRoles)) === count($roleSlugs);
+        $userTemplateSlugs = $this->getTemplateSlugs();
+
+        foreach ($templateSlugs as $slug) {
+            if (!in_array($slug, $userTemplateSlugs)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
-     * Récupère tous les slugs des rôles
+     * Récupère tous les slugs des templates
      */
-    public function getRoleSlugs(): array
+    public function getTemplateSlugs(): array
     {
-        $slugs = $this->roles()->pluck('slug')->toArray();
+        $slugs = $this->templates->pluck('slug')->toArray();
 
-        if ($this->primaryRole) {
-            $slugs[] = $this->primaryRole->slug;
+        if ($this->primaryTemplate) {
+            $slugs[] = $this->primaryTemplate->slug;
         }
 
         return array_unique($slugs);
+    }
+
+    // Compatibility aliases for backward compatibility during migration
+    public function hasRole(string $roleSlug): bool
+    {
+        return $this->hasTemplate($roleSlug);
+    }
+
+    public function hasAnyRole(array $roleSlugs): bool
+    {
+        return $this->hasAnyTemplate($roleSlugs);
+    }
+
+    public function hasAllRoles(array $roleSlugs): bool
+    {
+        return $this->hasAllTemplates($roleSlugs);
+    }
+
+    public function getRoleSlugs(): array
+    {
+        return $this->getTemplateSlugs();
     }
 
     // ═══════════════════════════════════════════════════════
@@ -207,15 +208,14 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     /**
      * Vérifie si l'utilisateur a une permission
      *
-     * @param string $permissionSlug Format: 'resource.action' ou 'resource.scope.action'
-     * @param string|null $scopeType Type de scope ('shop', 'supplier', null)
-     * @param int|null $scopeId ID du scope
+     * @param string $permissionSlug Format: 'resource.action'
+     * @param Scope|int|null $scope Scope instance, ID, or null for global
      */
-    public function hasPermission(string $permissionSlug, ?string $scopeType = null, ?int $scopeId = null): bool
+    public function hasPermission(string $permissionSlug, Scope|int|null $scope = null): bool
     {
-        // Utiliser le service PermissionChecker
-        return app(\App\Services\PermissionChecker::class)
-            ->check($this, $permissionSlug, $scopeType, $scopeId);
+        // Utiliser le nouveau service PermissionChecker
+        return app(\App\Services\Permissions\PermissionChecker::class)
+            ->checkWithScope($this, $permissionSlug, $scope);
     }
 
     /**
@@ -304,11 +304,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
      */
     public function managesShop(int $shopId): bool
     {
-        return $this->shops()->where('shops.id', $shopId)->exists() ||
-               $this->roles()
-                   ->wherePivot('scope_type', 'shop')
-                   ->wherePivot('scope_id', $shopId)
-                   ->exists();
+        return $this->shops()->where('shops.id', $shopId)->exists();
     }
 
     /**
@@ -316,11 +312,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
      */
     public function managesSupplier(int $supplierId): bool
     {
-        return $this->suppliers()->where('suppliers.id', $supplierId)->exists() ||
-               $this->roles()
-                   ->wherePivot('scope_type', 'supplier')
-                   ->wherePivot('scope_id', $supplierId)
-                   ->exists();
+        return $this->suppliers()->where('suppliers.id', $supplierId)->exists();
     }
 
     /**
@@ -328,22 +320,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants
      */
     public function getManagedShops(): Collection
     {
-        if ($this->hasAnyRole(['super_admin', 'admin'])) {
+        if ($this->hasAnyTemplate(['super_admin', 'admin'])) {
             return Shop::all();
         }
 
-        // Boutiques directement liées
-        $directShops = $this->shops()->pluck('shops.id');
-
-        // Boutiques via user_roles avec scope
-        $scopedShops = $this->roles()
-            ->wherePivot('scope_type', 'shop')
-            ->whereNotNull('user_roles.scope_id')
-            ->pluck('user_roles.scope_id');
-
-        $allShopIds = $directShops->merge($scopedShops)->unique();
-
-        return Shop::whereIn('id', $allShopIds)->get();
+        return $this->shops;
     }
 
     /**
@@ -351,20 +332,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants
      */
     public function getManagedSuppliers(): Collection
     {
-        if ($this->hasAnyRole(['super_admin', 'admin'])) {
+        if ($this->hasAnyTemplate(['super_admin', 'admin'])) {
             return Supplier::all();
         }
 
-        $directSuppliers = $this->suppliers()->pluck('suppliers.id');
-
-        $scopedSuppliers = $this->roles()
-            ->wherePivot('scope_type', 'supplier')
-            ->whereNotNull('user_roles.scope_id')
-            ->pluck('user_roles.scope_id');
-
-        $allSupplierIds = $directSuppliers->merge($scopedSuppliers)->unique();
-
-        return Supplier::whereIn('id', $allSupplierIds)->get();
+        return $this->suppliers;
     }
 
     /**
@@ -372,17 +344,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants
      */
     public function getManagedSupervisors(): Collection
     {
-        if ($this->hasAnyRole(['super_admin', 'admin'])) {
+        if ($this->hasAnyTemplate(['super_admin', 'admin'])) {
             return Supervisor::all();
         }
 
-        $direct = $this->supervisors()->pluck('supervisors.id');
-        $scoped = $this->roles()
-            ->wherePivot('scope_type', 'supervisor')
-            ->pluck('user_roles.scope_id')
-            ->filter();
-
-        return Supervisor::whereIn('id', $direct->merge($scoped)->unique())->get();
+        return $this->supervisors;
     }
 
     /**
@@ -390,17 +356,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants
      */
     public function getManagedKitchens(): Collection
     {
-        if ($this->hasAnyRole(['super_admin', 'admin'])) {
+        if ($this->hasAnyTemplate(['super_admin', 'admin'])) {
             return Kitchen::all();
         }
 
-        $direct = $this->kitchens()->pluck('kitchens.id');
-        $scoped = $this->roles()
-            ->wherePivot('scope_type', 'kitchen')
-            ->pluck('user_roles.scope_id')
-            ->filter();
-
-        return Kitchen::whereIn('id', $direct->merge($scoped)->unique())->get();
+        return $this->kitchens;
     }
 
     /**
@@ -408,17 +368,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants
      */
     public function getManagedDrivers(): Collection
     {
-        if ($this->hasAnyRole(['super_admin', 'admin'])) {
+        if ($this->hasAnyTemplate(['super_admin', 'admin'])) {
             return Driver::all();
         }
 
-        $direct = $this->drivers()->pluck('drivers.id');
-        $scoped = $this->roles()
-            ->wherePivot('scope_type', 'driver')
-            ->pluck('user_roles.scope_id')
-            ->filter();
-
-        return Driver::whereIn('id', $direct->merge($scoped)->unique())->get();
+        return $this->drivers;
     }
 
     /**
@@ -571,31 +525,31 @@ class User extends Authenticatable implements FilamentUser, HasTenants
      */
     public function getDefaultPanelUrl(): string
     {
-        if ($this->primary_role_id) {
-            $role = $this->primaryRole;
-            return $this->getPanelUrlForRole($role->slug);
+        if ($this->primary_template_id) {
+            $template = $this->primaryTemplate;
+            return $this->getPanelUrlForTemplate($template->slug);
         }
 
-        $role = $this->roles()->orderBy('level', 'desc')->first();
+        $template = $this->templates()->first();
 
-        if ($role) {
-            return $this->getPanelUrlForRole($role->slug);
+        if ($template) {
+            return $this->getPanelUrlForTemplate($template->slug);
         }
 
         return '/';
     }
 
     /**
-     * URL du panel selon le rôle
+     * URL du panel selon le template
      */
-    protected function getPanelUrlForRole(string $roleSlug): string
+    protected function getPanelUrlForTemplate(string $templateSlug): string
     {
         return match (true) {
-            in_array($roleSlug, ['super_admin', 'admin']) => '/admin',
-            str_starts_with($roleSlug, 'shop_manager') => '/shop',
-            str_starts_with($roleSlug, 'kitchen') => '/kitchen',
-            $roleSlug === 'driver' => '/driver',
-            str_starts_with($roleSlug, 'supplier') => '/supplier',
+            in_array($templateSlug, ['super_admin', 'admin']) => '/admin',
+            str_starts_with($templateSlug, 'shop_manager') => '/shop',
+            str_starts_with($templateSlug, 'kitchen') => '/kitchen',
+            $templateSlug === 'driver' => '/driver',
+            str_starts_with($templateSlug, 'supplier') => '/supplier',
             default => '/',
         };
     }
