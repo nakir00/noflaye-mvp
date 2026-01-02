@@ -63,18 +63,34 @@ class PermissionTemplate extends Model
         'auto_sync_users',
     ];
 
-    protected $casts = [
-        'level' => 'integer',
-        'sort_order' => 'integer',
-        'is_active' => 'boolean',
-        'is_system' => 'boolean',
-        'auto_sync_users' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            // Integer columns
+            'parent_id' => 'integer',
+            'scope_id' => 'integer',
+            'level' => 'integer',
+            'sort_order' => 'integer',
 
-    protected $with = ['permissions', 'wildcards'];
+            // Boolean columns
+            'is_active' => 'boolean',
+            'is_system' => 'boolean',
+            'auto_sync_users' => 'boolean',
+
+            // DateTime columns
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+            'deleted_at' => 'datetime',
+        ];
+    }
+
+    // Disabled eager loading - enable only when needed
+    // protected $with = ['permissions', 'wildcards'];
 
     // ========================================
     // RELATIONSHIPS
@@ -92,7 +108,7 @@ class PermissionTemplate extends Model
 
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(Permission::class, 'template_permissions')
+        return $this->belongsToMany(Permission::class, 'template_permissions', 'template_id', 'permission_id')
             ->withPivot('source', 'wildcard_id', 'sort_order')
             ->withTimestamps();
     }

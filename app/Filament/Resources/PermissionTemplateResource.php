@@ -5,13 +5,19 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PermissionTemplateResource\Pages;
 use App\Models\PermissionTemplate;
 use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -42,8 +48,8 @@ class PermissionTemplateResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($state, Forms\Set $set) =>
-                                $set('slug', \Illuminate\Support\Str::slug($state))
+                            ->afterStateUpdated(fn ($state, Set $set) =>
+                                $set('slug', Str::slug($state))
                             ),
 
                         Forms\Components\TextInput::make('slug')
@@ -196,10 +202,10 @@ class PermissionTemplateResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_system')
                     ->label('System Template'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
 
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->requiresConfirmation()
                     ->before(function (PermissionTemplate $record) {
                         if ($record->is_system) {
@@ -210,9 +216,9 @@ class PermissionTemplateResource extends Resource
                         }
                     }),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

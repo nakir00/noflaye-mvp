@@ -48,16 +48,31 @@ class PermissionWildcard extends Model
         'permissions_count',
     ];
 
-    protected $casts = [
-        'pattern_type' => 'string',
-        'sort_order' => 'integer',
-        'is_active' => 'boolean',
-        'auto_expand' => 'boolean',
-        'last_expanded_at' => 'datetime',
-        'permissions_count' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            // Enum columns
+            'pattern_type' => WildcardPattern::class,
+
+            // Boolean columns
+            'is_active' => 'boolean',
+            'auto_expand' => 'boolean',
+
+            // Integer columns
+            'sort_order' => 'integer',
+            'permissions_count' => 'integer',
+
+            // DateTime columns
+            'last_expanded_at' => 'datetime',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ];
+    }
 
     // ========================================
     // RELATIONSHIPS

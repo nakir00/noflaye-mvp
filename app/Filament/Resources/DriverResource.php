@@ -113,10 +113,10 @@ class DriverResource extends Resource
     public static function getRelations(): array
     {
         return [
-            UsersRelationManager::class,
-            ShopsRelationManager::class,
-            KitchensRelationManager::class,
-            UserGroupsRelationManager::class,
+            // UsersRelationManager::class, // TODO: Create this RelationManager
+            // ShopsRelationManager::class, // TODO: Create this RelationManager
+            // KitchensRelationManager::class, // TODO: Create this RelationManager
+            // UserGroupsRelationManager::class, // TODO: Create this RelationManager
         ];
     }
 

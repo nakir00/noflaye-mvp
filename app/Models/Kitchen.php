@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Filament\Models\Contracts\HasName;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -27,13 +28,145 @@ class Kitchen extends Model implements HasName
     protected function casts(): array
     {
         return [
+            // Boolean columns
             'is_active' => 'boolean',
-            'operating_hours' => 'array',
+
+            // Integer columns
             'capacity' => 'integer',
+
+            // Array/JSON columns
+            'operating_hours' => 'array',
+
+            // DateTime columns
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 
-    // Relations
+    // ========================================
+    // ATTRIBUTES ACCESSORS
+    // ========================================
+
+    /**
+     * Get the kitchen name.
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? trim($value) : null,
+            set: fn (?string $value) => $value ? trim($value) : null,
+        );
+    }
+
+    /**
+     * Get the kitchen slug.
+     */
+    protected function slug(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? strtolower(trim($value)) : null,
+            set: fn (?string $value) => $value ? strtolower(trim($value)) : null,
+        );
+    }
+
+    /**
+     * Get the kitchen description.
+     */
+    protected function description(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? trim($value) : null,
+            set: fn (?string $value) => $value ? trim($value) : null,
+        );
+    }
+
+    /**
+     * Get the kitchen phone.
+     */
+    protected function phone(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? trim($value) : null,
+            set: fn (?string $value) => $value ? trim($value) : null,
+        );
+    }
+
+    /**
+     * Get the kitchen email.
+     */
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? strtolower(trim($value)) : null,
+            set: fn (?string $value) => $value ? strtolower(trim($value)) : null,
+        );
+    }
+
+    /**
+     * Get the kitchen address.
+     */
+    protected function address(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? trim($value) : null,
+            set: fn (?string $value) => $value ? trim($value) : null,
+        );
+    }
+
+    /**
+     * Get the is_active status.
+     */
+    protected function isActive(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+        );
+    }
+
+    /**
+     * Get the operating hours.
+     */
+    protected function operatingHours(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+        );
+    }
+
+    /**
+     * Get the capacity.
+     */
+    protected function capacity(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+        );
+    }
+
+    /**
+     * Get the created at timestamp.
+     */
+    protected function createdAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+        );
+    }
+
+    /**
+     * Get the updated at timestamp.
+     */
+    protected function updatedAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+        );
+    }
+
+    // ========================================
+    // RELATIONSHIPS
+    // ========================================
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'kitchen_user')->withTimestamps();

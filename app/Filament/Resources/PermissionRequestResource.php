@@ -6,13 +6,20 @@ use App\Filament\Resources\PermissionRequestResource\Pages;
 use App\Models\PermissionRequest;
 use App\Services\Permissions\PermissionApprovalWorkflow;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Forms\Components\Textarea;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
 /**
@@ -21,6 +28,7 @@ use UnitEnum;
  * Filament resource for managing permission requests
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionRequestResource extends Resource
@@ -198,10 +206,10 @@ class PermissionRequestResource extends Resource
                             ->when($data['created_until'], fn ($query, $date) => $query->whereDate('created_at', '<=', $date));
                     }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
 
-                Tables\Actions\Action::make('approve')
+                Action::make('approve')
                     ->label('Approve')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -213,49 +221,49 @@ class PermissionRequestResource extends Resource
                     ])
                     ->action(function (PermissionRequest $record, array $data) {
                         $workflow = app(PermissionApprovalWorkflow::class);
-                        $workflow->approve($record, auth()->user(), $data['review_reason'] ?? null);
+                        $workflow->approveRequest($record, Auth::user(), $data['review_reason'] ?? null);
 
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Request approved')
                             ->success()
                             ->send();
                     })
                     ->visible(fn (PermissionRequest $record) => $record->status === 'pending'),
 
-                Tables\Actions\Action::make('reject')
+                Action::make('reject')
                     ->label('Reject')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->form([
-                        Forms\Components\Textarea::make('review_reason')
+                    ->schema([
+                        Textarea::make('review_reason')
                             ->label('Rejection Reason')
                             ->required()
                             ->maxLength(255),
                     ])
                     ->action(function (PermissionRequest $record, array $data) {
                         $workflow = app(PermissionApprovalWorkflow::class);
-                        $workflow->reject($record, auth()->user(), $data['review_reason']);
+                        $workflow->rejectRequest($record, Auth::user(), $data['review_reason']);
 
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Request rejected')
                             ->success()
                             ->send();
                     })
                     ->visible(fn (PermissionRequest $record) => $record->status === 'pending'),
 
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->visible(fn (PermissionRequest $record) => $record->status === 'rejected'),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('approve_all')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('approve_all')
                         ->label('Approve All')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->form([
-                            Forms\Components\Textarea::make('review_reason')
+                        ->schema([
+                            Textarea::make('review_reason')
                                 ->label('Approval Reason'),
                         ])
                         ->action(function (\Illuminate\Database\Eloquent\Collection $records, array $data) {
@@ -264,24 +272,24 @@ class PermissionRequestResource extends Resource
 
                             foreach ($records as $record) {
                                 if ($record->status === 'pending') {
-                                    $workflow->approve($record, auth()->user(), $data['review_reason'] ?? null);
+                                    $workflow->approveRequest($record, Auth::user(), $data['review_reason'] ?? null);
                                     $count++;
                                 }
                             }
 
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title("Approved {$count} requests")
                                 ->success()
                                 ->send();
                         }),
 
-                    Tables\Actions\BulkAction::make('reject_all')
+                    BulkAction::make('reject_all')
                         ->label('Reject All')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->form([
-                            Forms\Components\Textarea::make('review_reason')
+                        ->schema([
+                            Textarea::make('review_reason')
                                 ->label('Rejection Reason')
                                 ->required(),
                         ])
@@ -291,12 +299,12 @@ class PermissionRequestResource extends Resource
 
                             foreach ($records as $record) {
                                 if ($record->status === 'pending') {
-                                    $workflow->reject($record, auth()->user(), $data['review_reason']);
+                                    $workflow->rejectRequest($record, Auth::user(), $data['review_reason']);
                                     $count++;
                                 }
                             }
 
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title("Rejected {$count} requests")
                                 ->success()
                                 ->send();

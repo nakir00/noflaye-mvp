@@ -53,8 +53,8 @@ return new class extends Migration
 
             // Unique constraint and indexes
             $table->unique(['user_id', 'template_id', 'scope_id'], 'unique_user_template_scope');
-            $table->index(['template_version', 'auto_upgrade'], 'idx_versioning');
-            $table->index(['valid_from', 'valid_until'], 'idx_validity');
+            $table->index(['template_version', 'auto_upgrade'], 'idx_user_templates_versioning');
+            $table->index(['valid_from', 'valid_until'], 'idx_user_templates_validity');
         });
     }
 

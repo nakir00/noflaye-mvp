@@ -37,7 +37,7 @@ return new class extends Migration
             // Performance indexes
             $table->index('parent_id');
             $table->index('template_id');
-            $table->index(['level', 'parent_id'], 'idx_hierarchy');
+            $table->index(['level', 'parent_id'], 'idx_user_groups_hierarchy');
         });
     }
 
@@ -49,7 +49,7 @@ return new class extends Migration
         Schema::table('user_groups', function (Blueprint $table) {
             $table->dropForeign(['parent_id']);
             $table->dropForeign(['template_id']);
-            $table->dropIndex('idx_hierarchy');
+            $table->dropIndex('idx__user_groups_hierarchy');
             $table->dropIndex(['parent_id']);
             $table->dropIndex(['template_id']);
             $table->dropColumn(['parent_id', 'level', 'template_id', 'auto_sync_template']);

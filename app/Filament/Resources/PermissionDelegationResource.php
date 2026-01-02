@@ -6,13 +6,20 @@ use App\Filament\Resources\PermissionDelegationResource\Pages;
 use App\Models\PermissionDelegation;
 use App\Services\Permissions\PermissionDelegator;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Form;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 use UnitEnum;
 
 /**
@@ -193,10 +200,10 @@ class PermissionDelegationResource extends Resource
                         }
                     }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
 
-                Tables\Actions\Action::make('revoke')
+                Action::make('revoke')
                     ->label('Revoke')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
@@ -209,7 +216,7 @@ class PermissionDelegationResource extends Resource
                     ])
                     ->action(function (PermissionDelegation $record, array $data) {
                         $delegator = app(PermissionDelegator::class);
-                        $delegator->revoke($record, auth()->user(), $data['revocation_reason']);
+                        $delegator->revoke($record, Auth::user(), $data['revocation_reason']);
 
                         \Filament\Notifications\Notification::make()
                             ->title('Delegation revoked')
@@ -218,12 +225,12 @@ class PermissionDelegationResource extends Resource
                     })
                     ->visible(fn (PermissionDelegation $record) => $record->isActive()),
 
-                Tables\Actions\Action::make('extend')
+                Action::make('extend')
                     ->label('Extend')
                     ->icon('heroicon-o-clock')
                     ->color('warning')
-                    ->form([
-                        Forms\Components\DateTimePicker::make('new_expiration')
+                    ->schema([
+                        DateTimePicker::make('new_expiration')
                             ->label('New Expiration Date')
                             ->required()
                             ->after(now())
@@ -240,12 +247,12 @@ class PermissionDelegationResource extends Resource
                     })
                     ->visible(fn (PermissionDelegation $record) => $record->isActive()),
 
-                Tables\Actions\DeleteAction::make()
+                DeleteAction::make()
                     ->visible(fn (PermissionDelegation $record) => !$record->isActive()),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('revoke_all')
+                BulkActionGroup::make([
+                    BulkAction::make('revoke_all')
                         ->label('Revoke All')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
@@ -261,7 +268,7 @@ class PermissionDelegationResource extends Resource
 
                             foreach ($records as $record) {
                                 if ($record->isActive()) {
-                                    $delegator->revoke($record, auth()->user(), $data['revocation_reason']);
+                                    $delegator->revoke($record, Auth::user(), $data['revocation_reason']);
                                     $count++;
                                 }
                             }

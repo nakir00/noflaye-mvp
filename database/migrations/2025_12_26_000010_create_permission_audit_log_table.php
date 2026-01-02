@@ -64,7 +64,7 @@ return new class extends Migration
             $table->index(['user_id', 'created_at'], 'idx_user_date');
             $table->index(['permission_slug', 'created_at'], 'idx_permission_date');
             $table->index(['action', 'created_at'], 'idx_action_date');
-            $table->index(['source', 'source_id'], 'idx_source');
+            $table->index(['source', 'source_id'], 'idx_permission_audit_logs_source');
         });
     }
 

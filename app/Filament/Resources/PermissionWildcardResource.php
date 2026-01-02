@@ -6,11 +6,17 @@ use App\Filament\Resources\PermissionWildcardResource\Pages;
 use App\Models\PermissionWildcard;
 use App\Services\Permissions\WildcardExpander;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -21,6 +27,7 @@ use UnitEnum;
  * Filament resource for managing permission wildcards
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionWildcardResource extends Resource
@@ -133,10 +140,10 @@ class PermissionWildcardResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_active'),
                 Tables\Filters\TernaryFilter::make('auto_expand'),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
+            ->recordActions([
+                EditAction::make(),
 
-                Tables\Actions\Action::make('expand')
+                Action::make('expand')
                     ->label('Expand Now')
                     ->icon('heroicon-o-arrow-path')
                     ->requiresConfirmation()
@@ -150,13 +157,13 @@ class PermissionWildcardResource extends Resource
                             ->send();
                     }),
 
-                Tables\Actions\DeleteAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
 
-                    Tables\Actions\BulkAction::make('expand_all')
+                    BulkAction::make('expand_all')
                         ->label('Expand All')
                         ->icon('heroicon-o-arrow-path')
                         ->requiresConfirmation()
@@ -168,7 +175,7 @@ class PermissionWildcardResource extends Resource
                                 $total += $expander->rebuildExpansions($record);
                             }
 
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title("Expanded to {$total} permissions")
                                 ->success()
                                 ->send();

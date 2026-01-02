@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
@@ -48,13 +49,30 @@ class PermissionRequest extends Model
         'metadata',
     ];
 
-    protected $casts = [
-        'requested_at' => 'datetime',
-        'reviewed_at' => 'datetime',
-        'metadata' => 'array',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            // Integer columns
+            'user_id' => 'integer',
+            'permission_id' => 'integer',
+            'scope_id' => 'integer',
+            'reviewed_by' => 'integer',
+
+            // JSON columns
+            'metadata' => AsArrayObject::class,
+
+            // DateTime columns
+            'requested_at' => 'datetime',
+            'reviewed_at' => 'datetime',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ];
+    }
 
     // ========================================
     // RELATIONSHIPS
@@ -78,6 +96,12 @@ class PermissionRequest extends Model
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    // Alias for consistency
+    public function approver(): BelongsTo
+    {
+        return $this->reviewer();
     }
 
     // ========================================

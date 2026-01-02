@@ -104,11 +104,11 @@ class SupervisorResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\UsersRelationManager::class,
-            RelationManagers\ShopsRelationManager::class,
-            RelationManagers\KitchensRelationManager::class,
-            RelationManagers\DriversRelationManager::class,
-            RelationManagers\UserGroupsRelationManager::class,
+            // RelationManagers\UsersRelationManager::class, // TODO: Create this RelationManager
+            // RelationManagers::ShopsRelationManager::class, // TODO: Create this RelationManager
+            // RelationManagers::KitchensRelationManager::class, // TODO: Create this RelationManager
+            // RelationManagers::DriversRelationManager::class, // TODO: Create this RelationManager
+            // RelationManagers::UserGroupsRelationManager::class, // TODO: Create this RelationManager
         ];
     }
 

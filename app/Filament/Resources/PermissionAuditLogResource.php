@@ -5,10 +5,17 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PermissionAuditLogResource\Pages;
 use App\Models\PermissionAuditLog;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 
 /**
@@ -107,9 +114,9 @@ class PermissionAuditLogResource extends Resource
                         'wildcard' => 'Wildcard',
                     ]),
 
-                Tables\Filters\Filter::make('user_name')
-                    ->form([
-                        Forms\Components\TextInput::make('user_name')
+                Filter::make('user_name')
+                    ->schema([
+                        TextInput::make('user_name')
                             ->label('User Name'),
                     ])
                     ->query(function ($query, array $data) {
@@ -118,9 +125,9 @@ class PermissionAuditLogResource extends Resource
                         );
                     }),
 
-                Tables\Filters\Filter::make('permission_slug')
-                    ->form([
-                        Forms\Components\TextInput::make('permission_slug')
+                Filter::make('permission_slug')
+                    ->schema([
+                        TextInput::make('permission_slug')
                             ->label('Permission Slug'),
                     ])
                     ->query(function ($query, array $data) {
@@ -129,9 +136,9 @@ class PermissionAuditLogResource extends Resource
                         );
                     }),
 
-                Tables\Filters\Filter::make('performed_by_name')
-                    ->form([
-                        Forms\Components\TextInput::make('performed_by_name')
+                Filter::make('performed_by_name')
+                    ->schema([
+                        TextInput::make('performed_by_name')
                             ->label('Performed By'),
                     ])
                     ->query(function ($query, array $data) {
@@ -140,8 +147,8 @@ class PermissionAuditLogResource extends Resource
                         );
                     }),
 
-                Tables\Filters\Filter::make('date_range')
-                    ->form([
+                Filter::make('date_range')
+                    ->schema([
                         Forms\Components\DatePicker::make('created_from')
                             ->label('From Date'),
                         Forms\Components\DatePicker::make('created_until')
@@ -157,9 +164,9 @@ class PermissionAuditLogResource extends Resource
                             );
                     }),
 
-                Tables\Filters\Filter::make('ip_address')
-                    ->form([
-                        Forms\Components\TextInput::make('ip_address')
+                Filter::make('ip_address')
+                    ->schema([
+                        TextInput::make('ip_address')
                             ->label('IP Address'),
                     ])
                     ->query(function ($query, array $data) {
@@ -168,8 +175,8 @@ class PermissionAuditLogResource extends Resource
                         );
                     }),
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make()
+            ->recordActions([
+                ViewAction::make()
                     ->modalHeading('Audit Log Details')
                     ->modalContent(function (PermissionAuditLog $record) {
                         return view('filament.resources.permission-audit-log.view-audit-log', [
@@ -177,7 +184,7 @@ class PermissionAuditLogResource extends Resource
                         ]);
                     }),
 
-                Tables\Actions\Action::make('export')
+                Action::make('export')
                     ->label('Export')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
@@ -200,13 +207,13 @@ class PermissionAuditLogResource extends Resource
                         }, 'audit-log-' . $record->id . '.csv');
                     }),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('export_all')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('export_all')
                         ->label('Export Selected')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
-                        ->action(function (\Illuminate\Database\Eloquent\Collection $records) {
+                        ->action(function (Collection $records) {
                             $csv = "Action,User,User Email,Permission,Source,Performed By,IP Address,Date,Reason\n";
 
                             foreach ($records as $record) {

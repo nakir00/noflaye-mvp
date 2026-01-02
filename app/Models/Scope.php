@@ -39,12 +39,26 @@ class Scope extends Model
         'is_active',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            // Integer columns
+            'scopable_id' => 'integer',
+
+            // Boolean columns
+            'is_active' => 'boolean',
+
+            // DateTime columns
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+            'deleted_at' => 'datetime',
+        ];
+    }
 
     // ========================================
     // RELATIONSHIPS

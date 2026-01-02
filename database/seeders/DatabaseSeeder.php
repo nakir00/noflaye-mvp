@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // Ordre d'exécution important
             PermissionSeeder::class,
+            PermissionTemplateSeeder::class,
             PanelConfigurationSeeder::class,
             MultiPanelUserSeeder::class,
         ]);

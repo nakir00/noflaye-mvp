@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -64,16 +65,36 @@ class PermissionDelegation extends Model
         'revocation_reason',
     ];
 
-    protected $casts = [
-        'valid_from' => 'datetime',
-        'valid_until' => 'datetime',
-        'can_redelegate' => 'boolean',
-        'max_redelegation_depth' => 'integer',
-        'metadata' => 'array',
-        'revoked_at' => 'datetime',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            // Integer columns
+            'delegator_id' => 'integer',
+            'delegatee_id' => 'integer',
+            'permission_id' => 'integer',
+            'scope_id' => 'integer',
+            'max_redelegation_depth' => 'integer',
+            'revoked_by' => 'integer',
+
+            // Boolean columns
+            'can_redelegate' => 'boolean',
+
+            // DateTime columns
+            'valid_from' => 'datetime',
+            'valid_until' => 'datetime',
+            'revoked_at' => 'datetime',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+
+            // JSON columns
+            'metadata' => AsArrayObject::class,
+        ];
+    }
 
     // ========================================
     // RELATIONSHIPS

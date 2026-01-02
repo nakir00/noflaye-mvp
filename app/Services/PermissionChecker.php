@@ -21,6 +21,13 @@ class PermissionChecker
         ?int $scopeId = null,
         array $context = []
     ): bool {
+        dd('Checking permission', [
+            'user_id' => $user->id,
+            'permission' => $permissionSlug,
+            'scope_type' => $scopeType,
+            'scope_id' => $scopeId,
+            'context' => $context,
+        ]);
         // Super Admin a toutes les permissions
         if ($user->hasRole('super_admin')) {
             return true;

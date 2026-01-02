@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AuditAction;
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
@@ -61,10 +62,27 @@ class PermissionAuditLog extends Model
         'user_agent',
     ];
 
-    protected $casts = [
-        'metadata' => 'array',
-        'created_at' => 'datetime',
-    ];
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            // Integer columns
+            'user_id' => 'integer',
+            'source_id' => 'integer',
+            'scope_id' => 'integer',
+            'performed_by' => 'integer',
+
+            // JSON columns
+            'metadata' => AsArrayObject::class,
+
+            // DateTime columns
+            'created_at' => 'datetime',
+        ];
+    }
 
     // ========================================
     // RELATIONSHIPS

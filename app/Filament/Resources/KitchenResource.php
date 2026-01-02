@@ -89,12 +89,12 @@ class KitchenResource extends Resource
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active'),
             ])
-            ->actions([
+            ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
@@ -104,10 +104,10 @@ class KitchenResource extends Resource
     public static function getRelations(): array
     {
         return [
-            UsersRelationManager::class,
-            RelationManagers\ShopsRelationManager::class,
-            RelationManagers\DriversRelationManager::class,
-            RelationManagers\UserGroupsRelationManager::class,
+            // UsersRelationManager::class, // TODO: Create this RelationManager
+            // RelationManagers::ShopsRelationManager::class, // TODO: Create this RelationManager
+            // RelationManagers::DriversRelationManager::class, // TODO: Create this RelationManager
+            // RelationManagers::UserGroupsRelationManager::class, // TODO: Create this RelationManager
         ];
     }
 

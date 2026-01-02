@@ -5,6 +5,7 @@ namespace App\Models;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,13 +32,101 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         'remember_token',
     ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [
+            // DateTime columns
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+
+            // Integer columns
             'primary_template_id' => 'integer',
+
+            // Password hashing
+            'password' => 'hashed',
         ];
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // ATTRIBUTES ACCESSORS
+    // ═══════════════════════════════════════════════════════
+
+    /**
+     * Get the user's name.
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? trim($value) : null,
+            set: fn (?string $value) => $value ? trim($value) : null,
+        );
+    }
+
+    /**
+     * Get the user's email.
+     */
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? strtolower(trim($value)) : null,
+            set: fn (?string $value) => $value ? strtolower(trim($value)) : null,
+        );
+    }
+
+    /**
+     * Get the email verified at timestamp.
+     */
+    protected function emailVerifiedAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+        );
+    }
+
+    /**
+     * Get the primary template ID.
+     */
+    protected function primaryTemplateId(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+        );
+    }
+
+    /**
+     * Get the remember token.
+     */
+    protected function rememberToken(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+        );
+    }
+
+    /**
+     * Get the created at timestamp.
+     */
+    protected function createdAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+        );
+    }
+
+    /**
+     * Get the updated at timestamp.
+     */
+    protected function updatedAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value,
+        );
     }
 
     // ═══════════════════════════════════════════════════════
@@ -57,7 +146,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
      */
     public function templates(): BelongsToMany
     {
-        return $this->belongsToMany(PermissionTemplate::class, 'user_templates')
+        return $this->belongsToMany(PermissionTemplate::class, 'user_templates', 'user_id', 'template_id')
             ->withPivot('scope_id', 'template_version', 'auto_upgrade', 'auto_sync', 'valid_from', 'valid_until')
             ->withTimestamps();
     }

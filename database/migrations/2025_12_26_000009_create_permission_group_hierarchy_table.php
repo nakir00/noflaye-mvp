@@ -33,8 +33,8 @@ return new class extends Migration
 
             // Unique constraint and indexes
             $table->unique(['ancestor_id', 'descendant_id'], 'unique_permission_group_hierarchy');
-            $table->index(['ancestor_id', 'depth'], 'idx_ancestor_depth');
-            $table->index(['descendant_id', 'depth'], 'idx_descendant_depth');
+            $table->index(['ancestor_id', 'depth'], 'idx_permission_group_hierarchy_ancestor_depth');
+            $table->index(['descendant_id', 'depth'], 'idx_permission_group_hierarchy_descendant_depth');
         });
     }
 

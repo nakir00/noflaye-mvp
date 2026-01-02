@@ -65,8 +65,8 @@ return new class extends Migration
             // Performance indexes
             $table->index('delegator_id');
             $table->index('delegatee_id');
-            $table->index(['valid_from', 'valid_until'], 'idx_validity');
-            $table->index(['delegatee_id', 'revoked_at', 'valid_until'], 'idx_active_delegations');
+            $table->index(['valid_from', 'valid_until'], 'idx_permission_delegations_validity');
+            $table->index(['delegatee_id', 'revoked_at', 'valid_until'], 'idx_permission_delegations_active_delegations');
         });
     }
 
