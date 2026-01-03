@@ -10,28 +10,46 @@ use Illuminate\Support\Collection;
 
 /**
  * PermissionWildcard Model
- *
+ * 
  * Wildcard patterns for automatic permission expansion
  *
+ * @author Noflaye Box Team
+ * @version 1.0.0
  * @property int $id
  * @property string $pattern
  * @property string|null $description
- * @property string $pattern_type
+ * @property WildcardPattern $pattern_type
  * @property string|null $icon
  * @property string $color
  * @property int $sort_order
  * @property bool $is_active
  * @property bool $auto_expand
- * @property \Carbon\Carbon|null $last_expanded_at
- * @property int $permissions_count
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- *
- * @property-read Collection<Permission> $permissions
- * @property-read Collection<PermissionTemplate> $templates
- *
- * @author Noflaye Box Team
- * @version 1.0.0
+ * @property \Illuminate\Support\Carbon|null $last_expanded_at
+ * @property-read int|null $permissions_count
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PermissionTemplate> $templates
+ * @property-read int|null $templates_count
+ * @method static Builder<static>|PermissionWildcard active()
+ * @method static Builder<static>|PermissionWildcard autoExpand()
+ * @method static Builder<static>|PermissionWildcard newModelQuery()
+ * @method static Builder<static>|PermissionWildcard newQuery()
+ * @method static Builder<static>|PermissionWildcard query()
+ * @method static Builder<static>|PermissionWildcard whereAutoExpand($value)
+ * @method static Builder<static>|PermissionWildcard whereColor($value)
+ * @method static Builder<static>|PermissionWildcard whereCreatedAt($value)
+ * @method static Builder<static>|PermissionWildcard whereDescription($value)
+ * @method static Builder<static>|PermissionWildcard whereIcon($value)
+ * @method static Builder<static>|PermissionWildcard whereId($value)
+ * @method static Builder<static>|PermissionWildcard whereIsActive($value)
+ * @method static Builder<static>|PermissionWildcard whereLastExpandedAt($value)
+ * @method static Builder<static>|PermissionWildcard wherePattern($value)
+ * @method static Builder<static>|PermissionWildcard wherePatternType($value)
+ * @method static Builder<static>|PermissionWildcard wherePermissionsCount($value)
+ * @method static Builder<static>|PermissionWildcard whereSortOrder($value)
+ * @method static Builder<static>|PermissionWildcard whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 class PermissionWildcard extends Model
 {

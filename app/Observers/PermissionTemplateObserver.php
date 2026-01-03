@@ -5,8 +5,10 @@ namespace App\Observers;
 use App\Models\PermissionTemplate;
 use App\Services\Permissions\WildcardExpander;
 use App\Services\Permissions\PermissionChecker;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * PermissionTemplateObserver
@@ -22,6 +24,17 @@ class PermissionTemplateObserver
         private WildcardExpander $wildcardExpander,
         private PermissionChecker $permissionChecker
     ) {}
+
+    /**
+     * Handle the PermissionTemplate "creating" event (before save)
+     */
+    public function creating(PermissionTemplate $template): void
+    {
+        // Auto-generate slug if not provided
+        if (empty($template->slug) && !empty($template->name)) {
+            $template->slug = Str::slug($template->name);
+        }
+    }
 
     /**
      * Handle the PermissionTemplate "saved" event
@@ -44,6 +57,9 @@ class PermissionTemplateObserver
         if ($template->isDirty('parent_id')) {
             $this->rebuildHierarchyForTemplate($template);
         }
+
+        // Clear template cache
+        $this->clearTemplateCache();
     }
 
     /**
@@ -129,5 +145,13 @@ class PermissionTemplateObserver
         }
 
         return $ancestors;
+    }
+
+    /**
+     * Clear template-related cache
+     */
+    private function clearTemplateCache(): void
+    {
+        Cache::tags(['templates', 'permissions'])->flush();
     }
 }

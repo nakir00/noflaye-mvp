@@ -9,6 +9,37 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
+/**
+ * @property int $id
+ * @property string|null $name
+ * @property string|null $slug
+ * @property string|null $description
+ * @property string|null $phone
+ * @property string|null $email
+ * @property string|null $address
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserGroup> $userGroups
+ * @property-read int|null $user_groups_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
+ * @method static \Database\Factories\SupplierFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Supplier extends Model implements HasName
 {
     /** @use HasFactory<\Database\Factories\SupplierFactory> */
@@ -159,14 +190,42 @@ class Supplier extends Model implements HasName
         return $this->name;
     }
 
+    // ========================================
+    // HELPER METHODS
+    // ========================================
+
     /**
-     * Managers de ce fournisseur
+     * Get managers of this supplier
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function managers(): BelongsToMany
     {
-        return $this->users()
-            ->whereHas('roles', function ($query) {
-                $query->where('slug', 'like', '%manager%');
-            });
+        return $this->users()->whereHas('templates', function ($query) {
+            $query->where('slug', 'like', '%manager%');
+        });
+    }
+
+    /**
+     * Get all staff members of this supplier
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function staff(): BelongsToMany
+    {
+        return $this->users()->whereHas('templates', function ($query) {
+            $query->where('slug', 'like', '%staff%');
+        });
+    }
+
+    /**
+     * Scope query to only active suppliers
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

@@ -8,6 +8,34 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string|null $name
+ * @property string|null $slug
+ * @property string|null $description
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $parent_id
+ * @property int $level
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, PermissionGroup> $children
+ * @property-read int|null $children_count
+ * @property-read PermissionGroup|null $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @method static \Database\Factories\PermissionGroupFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup whereLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class PermissionGroup extends Model
 {
     /** @use HasFactory<\Database\Factories\PermissionGroupFactory> */

@@ -9,6 +9,42 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
+/**
+ * @property int $id
+ * @property string|null $name
+ * @property string|null $slug
+ * @property string|null $description
+ * @property string|null $phone
+ * @property string|null $email
+ * @property string|null $address
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Driver> $drivers
+ * @property-read int|null $drivers_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Kitchen> $kitchens
+ * @property-read int|null $kitchens_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Shop> $shops
+ * @property-read int|null $shops_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserGroup> $userGroups
+ * @property-read int|null $user_groups_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Supervisor extends Model implements HasName
 {
     use HasFactory;
@@ -170,11 +206,42 @@ class Supervisor extends Model implements HasName
         return $this->name;
     }
 
-    // Helpers
+    // ========================================
+    // HELPER METHODS
+    // ========================================
+
+    /**
+     * Get managers of this supervisor
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function managers(): BelongsToMany
     {
-        return $this->users()->whereHas('roles', function ($query) {
+        return $this->users()->whereHas('templates', function ($query) {
             $query->where('slug', 'like', '%manager%');
         });
+    }
+
+    /**
+     * Get all staff members of this supervisor
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function staff(): BelongsToMany
+    {
+        return $this->users()->whereHas('templates', function ($query) {
+            $query->where('slug', 'like', '%staff%');
+        });
+    }
+
+    /**
+     * Scope query to only active supervisors
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

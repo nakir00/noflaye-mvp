@@ -4,7 +4,9 @@ namespace App\Observers;
 
 use App\Models\Permission;
 use App\Services\Permissions\WildcardExpander;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * PermissionObserver
@@ -21,12 +23,26 @@ class PermissionObserver
     ) {}
 
     /**
+     * Handle the Permission "creating" event (before save)
+     */
+    public function creating(Permission $permission): void
+    {
+        // Auto-generate slug if not provided
+        if (empty($permission->slug) && !empty($permission->name)) {
+            $permission->slug = Str::slug($permission->name);
+        }
+    }
+
+    /**
      * Handle the Permission "created" event
      */
     public function created(Permission $permission): void
     {
         // Rebuild wildcard expansions
         $this->rebuildWildcardsForPermission($permission);
+
+        // Clear permission cache
+        $this->clearPermissionCache();
 
         Log::info('Permission created', [
             'permission_id' => $permission->id,
@@ -50,6 +66,9 @@ class PermissionObserver
                 'new_slug' => $permission->slug,
             ]);
         }
+
+        // Clear permission cache
+        $this->clearPermissionCache();
     }
 
     /**
@@ -91,5 +110,13 @@ class PermissionObserver
                 $this->wildcardExpander->rebuildExpansions($wildcard);
             }
         }
+    }
+
+    /**
+     * Clear permission-related cache
+     */
+    private function clearPermissionCache(): void
+    {
+        Cache::tags(['permissions'])->flush();
     }
 }

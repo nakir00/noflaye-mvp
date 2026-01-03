@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * PermissionTemplateVersion Model
- *
+ * 
  * Version control for permission templates with snapshots
  *
+ * @author Noflaye Box Team
+ * @version 1.0.0
  * @property int $id
  * @property int $template_id
  * @property int $version
@@ -22,23 +24,47 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string|null $color
  * @property string|null $icon
  * @property int $level
- * @property array $permissions_snapshot
- * @property array|null $wildcards_snapshot
+ * @property array<array-key, mixed> $permissions_snapshot
+ * @property array<array-key, mixed>|null $wildcards_snapshot
  * @property string|null $version_name
  * @property string|null $changelog
  * @property bool $is_stable
  * @property bool $is_published
  * @property int|null $created_by
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon|null $published_at
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon|null $published_at
  * @property int|null $published_by
- *
- * @property-read PermissionTemplate $template
- * @property-read User|null $creator
- * @property-read User|null $publisher
- *
- * @author Noflaye Box Team
- * @version 1.0.0
+ * @property-read \App\Models\User|null $creator
+ * @property-read \App\Models\User|null $publisher
+ * @property-read \App\Models\PermissionTemplate $template
+ * @method static Builder<static>|PermissionTemplateVersion latest()
+ * @method static Builder<static>|PermissionTemplateVersion newModelQuery()
+ * @method static Builder<static>|PermissionTemplateVersion newQuery()
+ * @method static Builder<static>|PermissionTemplateVersion published()
+ * @method static Builder<static>|PermissionTemplateVersion query()
+ * @method static Builder<static>|PermissionTemplateVersion stable()
+ * @method static Builder<static>|PermissionTemplateVersion whereChangelog($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereColor($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereCreatedAt($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereCreatedBy($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereDescription($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereIcon($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereId($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereIsPublished($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereIsStable($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereLevel($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereName($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereParentId($value)
+ * @method static Builder<static>|PermissionTemplateVersion wherePermissionsSnapshot($value)
+ * @method static Builder<static>|PermissionTemplateVersion wherePublishedAt($value)
+ * @method static Builder<static>|PermissionTemplateVersion wherePublishedBy($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereScopeId($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereSlug($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereTemplateId($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereVersion($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereVersionName($value)
+ * @method static Builder<static>|PermissionTemplateVersion whereWildcardsSnapshot($value)
+ * @mixin \Eloquent
  */
 class PermissionTemplateVersion extends Model
 {

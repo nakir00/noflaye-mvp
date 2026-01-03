@@ -9,6 +9,48 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
+/**
+ * @property int $id
+ * @property string|null $name
+ * @property string|null $slug
+ * @property string|null $description
+ * @property string|null $phone
+ * @property string|null $email
+ * @property string|null $vehicle_type
+ * @property string|null $vehicle_number
+ * @property string|null $license_number
+ * @property bool $is_active
+ * @property bool $is_available
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Kitchen> $kitchens
+ * @property-read int|null $kitchens_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Shop> $shops
+ * @property-read int|null $shops_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Supervisor> $supervisors
+ * @property-read int|null $supervisors_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserGroup> $userGroups
+ * @property-read int|null $user_groups_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereIsAvailable($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereLicenseNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereVehicleNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereVehicleType($value)
+ * @mixin \Eloquent
+ */
 class Driver extends Model implements HasName
 {
     use HasFactory;
@@ -90,10 +132,10 @@ class Driver extends Model implements HasName
     /**
      * Get the driver email.
      */
-    protected function email(): Attribute
+    protected function email(): Attribute | string | null
     {
         return Attribute::make(
-            get: fn (?string $value) => $value ? strtolower(trim($value)) : null,
+            get: fn (?string $value): string | null => $value ? strtolower(trim($value)) : null,
             set: fn (?string $value) => $value ? strtolower(trim($value)) : null,
         );
     }
@@ -200,9 +242,39 @@ class Driver extends Model implements HasName
         return $this->morphMany(UserGroup::class, 'groupable');
     }
 
-    // Filament
+    // ========================================
+    // FILAMENT
+    // ========================================
+
     public function getFilamentName(): string
     {
         return $this->name;
+    }
+
+    // ========================================
+    // QUERY SCOPES
+    // ========================================
+
+    /**
+     * Scope query to only active drivers
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope query to only available drivers
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeAvailable($query)
+    {
+        return $query->where('is_available', true)
+                     ->where('is_active', true);
     }
 }

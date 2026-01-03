@@ -14,11 +14,65 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Spatie\Activitylog\LogsActivity;
+use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
 
+/**
+ * @property int $id
+ * @property string|null $name
+ * @property string|null $email
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property string $password
+ * @property string|null $remember_token
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $primary_template_id
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PermissionDelegation> $delegationsGiven
+ * @property-read int|null $delegations_given_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PermissionDelegation> $delegationsReceived
+ * @property-read int|null $delegations_received_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Driver> $drivers
+ * @property-read int|null $drivers_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Kitchen> $kitchens
+ * @property-read int|null $kitchens_count
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PermissionRequest> $permissionRequests
+ * @property-read int|null $permission_requests_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @property-read \App\Models\PermissionTemplate|null $primaryTemplate
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Scope> $scopes
+ * @property-read int|null $scopes_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Shop> $shops
+ * @property-read int|null $shops_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Supervisor> $supervisors
+ * @property-read int|null $supervisors_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Supplier> $suppliers
+ * @property-read int|null $suppliers_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PermissionTemplate> $templates
+ * @property-read int|null $templates_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserGroup> $userGroups
+ * @property-read int|null $user_groups_count
+ * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePrimaryTemplateId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class User extends Authenticatable implements FilamentUser, HasTenants
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, LogsActivityTrait;
 
     protected $fillable = [
         'name',
@@ -641,5 +695,20 @@ class User extends Authenticatable implements FilamentUser, HasTenants
             str_starts_with($templateSlug, 'supplier') => '/supplier',
             default => '/',
         };
+    }
+
+    // ========================================
+    // ACTIVITY LOG CONFIGURATION
+    // ========================================
+
+    /**
+     * Get the log name for activity logging
+     */
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logOnly(['name', 'email', 'primary_template_id'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

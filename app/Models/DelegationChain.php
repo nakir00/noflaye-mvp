@@ -6,6 +6,28 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $delegation_id
+ * @property int|null $parent_delegation_id
+ * @property int $depth
+ * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<array-key, mixed>|null $chain_path
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\PermissionDelegation $delegation
+ * @property-read \App\Models\PermissionDelegation|null $parentDelegation
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain whereChainPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain whereDelegationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain whereDepth($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain whereParentDelegationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class DelegationChain extends Model
 {
     /**

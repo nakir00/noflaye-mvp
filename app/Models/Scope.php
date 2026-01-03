@@ -9,23 +9,40 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Scope Model
- *
+ * 
  * Unified scope management for permissions, templates, and groups
  *
+ * @author Noflaye Box Team
+ * @version 1.0.0
  * @property int $id
  * @property string $scopable_type
  * @property int $scopable_id
  * @property string $scope_key
  * @property string|null $name
  * @property bool $is_active
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $deleted_at
- *
- * @property-read Model $scopable
- *
- * @author Noflaye Box Team
- * @version 1.0.0
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read Model|\Eloquent $scopable
+ * @method static Builder<static>|Scope active()
+ * @method static Builder<static>|Scope byKey(string $key)
+ * @method static Builder<static>|Scope byType(string $type)
+ * @method static Builder<static>|Scope newModelQuery()
+ * @method static Builder<static>|Scope newQuery()
+ * @method static Builder<static>|Scope onlyTrashed()
+ * @method static Builder<static>|Scope query()
+ * @method static Builder<static>|Scope whereCreatedAt($value)
+ * @method static Builder<static>|Scope whereDeletedAt($value)
+ * @method static Builder<static>|Scope whereId($value)
+ * @method static Builder<static>|Scope whereIsActive($value)
+ * @method static Builder<static>|Scope whereName($value)
+ * @method static Builder<static>|Scope whereScopableId($value)
+ * @method static Builder<static>|Scope whereScopableType($value)
+ * @method static Builder<static>|Scope whereScopeKey($value)
+ * @method static Builder<static>|Scope whereUpdatedAt($value)
+ * @method static Builder<static>|Scope withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|Scope withoutTrashed()
+ * @mixin \Eloquent
  */
 class Scope extends Model
 {

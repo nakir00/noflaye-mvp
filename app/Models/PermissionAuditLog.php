@@ -10,9 +10,11 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * PermissionAuditLog Model
- *
+ * 
  * Comprehensive audit trail for permission changes
  *
+ * @author Noflaye Box Team
+ * @version 1.0.0
  * @property int $id
  * @property int|null $user_id
  * @property string|null $user_name
@@ -27,17 +29,39 @@ use Illuminate\Database\Eloquent\Builder;
  * @property int|null $performed_by
  * @property string|null $performed_by_name
  * @property string|null $reason
- * @property array|null $metadata
+ * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<array-key, mixed>|null $metadata
  * @property string|null $ip_address
  * @property string|null $user_agent
- * @property \Carbon\Carbon $created_at
- *
- * @property-read User|null $user
- * @property-read Scope|null $scope
- * @property-read User|null $performer
- *
- * @author Noflaye Box Team
- * @version 1.0.0
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property-read \App\Models\User|null $performer
+ * @property-read \App\Models\Scope|null $scope
+ * @property-read \App\Models\User|null $user
+ * @method static Builder<static>|PermissionAuditLog byAction(string $action)
+ * @method static Builder<static>|PermissionAuditLog byPermission(string $permissionSlug)
+ * @method static Builder<static>|PermissionAuditLog byUser(int $userId)
+ * @method static Builder<static>|PermissionAuditLog newModelQuery()
+ * @method static Builder<static>|PermissionAuditLog newQuery()
+ * @method static Builder<static>|PermissionAuditLog query()
+ * @method static Builder<static>|PermissionAuditLog recent(int $days = 30)
+ * @method static Builder<static>|PermissionAuditLog whereAction($value)
+ * @method static Builder<static>|PermissionAuditLog whereCreatedAt($value)
+ * @method static Builder<static>|PermissionAuditLog whereId($value)
+ * @method static Builder<static>|PermissionAuditLog whereIpAddress($value)
+ * @method static Builder<static>|PermissionAuditLog whereMetadata($value)
+ * @method static Builder<static>|PermissionAuditLog wherePerformedBy($value)
+ * @method static Builder<static>|PermissionAuditLog wherePerformedByName($value)
+ * @method static Builder<static>|PermissionAuditLog wherePermissionName($value)
+ * @method static Builder<static>|PermissionAuditLog wherePermissionSlug($value)
+ * @method static Builder<static>|PermissionAuditLog whereReason($value)
+ * @method static Builder<static>|PermissionAuditLog whereScopeId($value)
+ * @method static Builder<static>|PermissionAuditLog whereSource($value)
+ * @method static Builder<static>|PermissionAuditLog whereSourceId($value)
+ * @method static Builder<static>|PermissionAuditLog whereSourceName($value)
+ * @method static Builder<static>|PermissionAuditLog whereUserAgent($value)
+ * @method static Builder<static>|PermissionAuditLog whereUserEmail($value)
+ * @method static Builder<static>|PermissionAuditLog whereUserId($value)
+ * @method static Builder<static>|PermissionAuditLog whereUserName($value)
+ * @mixin \Eloquent
  */
 class PermissionAuditLog extends Model
 {

@@ -9,13 +9,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Spatie\Activitylog\LogsActivity;
+use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
 
 /**
  * PermissionTemplate Model
- *
+ * 
  * Templates for grouping permissions (replaces roles)
  * Supports hierarchy, wildcards, and versioning
  *
+ * @author Noflaye Box Team
+ * @version 1.0.0
  * @property int $id
  * @property string $name
  * @property string $slug
@@ -29,24 +33,52 @@ use Illuminate\Support\Collection;
  * @property bool $is_active
  * @property bool $is_system
  * @property bool $auto_sync_users
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $deleted_at
- *
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, PermissionTemplate> $children
+ * @property-read int|null $children_count
  * @property-read PermissionTemplate|null $parent
- * @property-read Collection<PermissionTemplate> $children
- * @property-read Collection<Permission> $permissions
- * @property-read Collection<PermissionWildcard> $wildcards
- * @property-read Collection<User> $users
- * @property-read Collection<PermissionTemplateVersion> $versions
- * @property-read Scope|null $scope
- *
- * @author Noflaye Box Team
- * @version 1.0.0
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @property-read \App\Models\Scope|null $scope
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PermissionTemplateVersion> $versions
+ * @property-read int|null $versions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PermissionWildcard> $wildcards
+ * @property-read int|null $wildcards_count
+ * @method static Builder<static>|PermissionTemplate active()
+ * @method static Builder<static>|PermissionTemplate newModelQuery()
+ * @method static Builder<static>|PermissionTemplate newQuery()
+ * @method static Builder<static>|PermissionTemplate onlyTrashed()
+ * @method static Builder<static>|PermissionTemplate published()
+ * @method static Builder<static>|PermissionTemplate query()
+ * @method static Builder<static>|PermissionTemplate root()
+ * @method static Builder<static>|PermissionTemplate whereAutoSyncUsers($value)
+ * @method static Builder<static>|PermissionTemplate whereColor($value)
+ * @method static Builder<static>|PermissionTemplate whereCreatedAt($value)
+ * @method static Builder<static>|PermissionTemplate whereDeletedAt($value)
+ * @method static Builder<static>|PermissionTemplate whereDescription($value)
+ * @method static Builder<static>|PermissionTemplate whereIcon($value)
+ * @method static Builder<static>|PermissionTemplate whereId($value)
+ * @method static Builder<static>|PermissionTemplate whereIsActive($value)
+ * @method static Builder<static>|PermissionTemplate whereIsSystem($value)
+ * @method static Builder<static>|PermissionTemplate whereLevel($value)
+ * @method static Builder<static>|PermissionTemplate whereName($value)
+ * @method static Builder<static>|PermissionTemplate whereParentId($value)
+ * @method static Builder<static>|PermissionTemplate whereScopeId($value)
+ * @method static Builder<static>|PermissionTemplate whereSlug($value)
+ * @method static Builder<static>|PermissionTemplate whereSortOrder($value)
+ * @method static Builder<static>|PermissionTemplate whereUpdatedAt($value)
+ * @method static Builder<static>|PermissionTemplate withTrashed(bool $withTrashed = true)
+ * @method static Builder<static>|PermissionTemplate withoutTrashed()
+ * @mixin \Eloquent
  */
 class PermissionTemplate extends Model
 {
     use SoftDeletes;
+    use LogsActivityTrait;
 
     protected $fillable = [
         'name',
@@ -190,5 +222,20 @@ class PermissionTemplate extends Model
         }
 
         return $users->count();
+    }
+
+    // ========================================
+    // ACTIVITY LOG CONFIGURATION
+    // ========================================
+
+    /**
+     * Get the log name for activity logging
+     */
+    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    {
+        return \Spatie\Activitylog\LogOptions::defaults()
+            ->logOnly(['name', 'slug', 'description', 'is_active', 'is_system', 'parent_id', 'level', 'sort_order'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

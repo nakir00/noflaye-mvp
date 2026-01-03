@@ -51,5 +51,6 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\PermissionGroup::observe(\App\Observers\PermissionGroupObserver::class);
         \App\Models\Permission::observe(\App\Observers\PermissionObserver::class);
         \App\Models\User::observe(\App\Observers\UserPermissionObserver::class);
+        \App\Models\User::observe(\App\Observers\UserObserver::class);
     }
 }

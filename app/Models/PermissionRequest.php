@@ -9,30 +9,49 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * PermissionRequest Model
- *
+ * 
  * Permission request/approval workflow
  *
+ * @author Noflaye Box Team
+ * @version 1.0.0
  * @property int $id
  * @property int $user_id
  * @property int $permission_id
  * @property int|null $scope_id
  * @property string $reason
  * @property string $status
- * @property \Carbon\Carbon $requested_at
- * @property \Carbon\Carbon|null $reviewed_at
+ * @property \Illuminate\Support\Carbon $requested_at
+ * @property \Illuminate\Support\Carbon|null $reviewed_at
  * @property int|null $reviewed_by
  * @property string|null $review_comment
- * @property array|null $metadata
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- *
- * @property-read User $user
- * @property-read Permission $permission
- * @property-read Scope|null $scope
- * @property-read User|null $reviewer
- *
- * @author Noflaye Box Team
- * @version 1.0.0
+ * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<array-key, mixed>|null $metadata
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User|null $approver
+ * @property-read \App\Models\Permission $permission
+ * @property-read \App\Models\User|null $reviewer
+ * @property-read \App\Models\Scope|null $scope
+ * @property-read \App\Models\User $user
+ * @method static Builder<static>|PermissionRequest approved()
+ * @method static Builder<static>|PermissionRequest newModelQuery()
+ * @method static Builder<static>|PermissionRequest newQuery()
+ * @method static Builder<static>|PermissionRequest pending()
+ * @method static Builder<static>|PermissionRequest query()
+ * @method static Builder<static>|PermissionRequest rejected()
+ * @method static Builder<static>|PermissionRequest whereCreatedAt($value)
+ * @method static Builder<static>|PermissionRequest whereId($value)
+ * @method static Builder<static>|PermissionRequest whereMetadata($value)
+ * @method static Builder<static>|PermissionRequest wherePermissionId($value)
+ * @method static Builder<static>|PermissionRequest whereReason($value)
+ * @method static Builder<static>|PermissionRequest whereRequestedAt($value)
+ * @method static Builder<static>|PermissionRequest whereReviewComment($value)
+ * @method static Builder<static>|PermissionRequest whereReviewedAt($value)
+ * @method static Builder<static>|PermissionRequest whereReviewedBy($value)
+ * @method static Builder<static>|PermissionRequest whereScopeId($value)
+ * @method static Builder<static>|PermissionRequest whereStatus($value)
+ * @method static Builder<static>|PermissionRequest whereUpdatedAt($value)
+ * @method static Builder<static>|PermissionRequest whereUserId($value)
+ * @mixin \Eloquent
  */
 class PermissionRequest extends Model
 {

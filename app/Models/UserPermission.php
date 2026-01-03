@@ -8,23 +8,40 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * User Permission Model
- *
+ * 
  * Represents the pivot table between users and permissions
  * as a full Eloquent model to enable queries in widgets/stats
  *
+ * @author Noflaye Box Team
+ * @version 1.0.0
  * @property int $id
  * @property int $user_id
  * @property int $permission_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int|null $scope_id
- * @property \Carbon\Carbon|null $expires_at
- * @property string|null $source
+ * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<array-key, mixed>|null $conditions
+ * @property string $source
  * @property int|null $source_id
- * @property array|null $conditions
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- *
- * @author Noflaye Box Team
- * @version 1.0.0
+ * @property-read \App\Models\Permission $permission
+ * @property-read \App\Models\Scope|null $scope
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission expired()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission fromSource(string $source)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission whereConditions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission wherePermissionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission whereScopeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission whereSource($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission whereSourceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission whereUserId($value)
+ * @mixin \Eloquent
  */
 class UserPermission extends Model
 {

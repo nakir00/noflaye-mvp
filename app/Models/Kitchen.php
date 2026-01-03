@@ -9,6 +9,46 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
+/**
+ * @property int $id
+ * @property string|null $name
+ * @property string|null $slug
+ * @property string|null $description
+ * @property string|null $phone
+ * @property string|null $email
+ * @property string|null $address
+ * @property bool $is_active
+ * @property array<array-key, mixed>|null $operating_hours
+ * @property int|null $capacity
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Driver> $drivers
+ * @property-read int|null $drivers_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Shop> $shops
+ * @property-read int|null $shops_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Supervisor> $supervisors
+ * @property-read int|null $supervisors_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserGroup> $userGroups
+ * @property-read int|null $user_groups_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereCapacity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereOperatingHours($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Kitchen extends Model implements HasName
 {
     use HasFactory;
@@ -198,11 +238,42 @@ class Kitchen extends Model implements HasName
         return $this->name;
     }
 
-    // Helpers
+    // ========================================
+    // HELPER METHODS
+    // ========================================
+
+    /**
+     * Get managers of this kitchen
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function managers(): BelongsToMany
     {
-        return $this->users()->whereHas('roles', function ($query) {
+        return $this->users()->whereHas('templates', function ($query) {
             $query->where('slug', 'like', '%manager%');
         });
+    }
+
+    /**
+     * Get all staff members of this kitchen
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function staff(): BelongsToMany
+    {
+        return $this->users()->whereHas('templates', function ($query) {
+            $query->where('slug', 'like', '%staff%');
+        });
+    }
+
+    /**
+     * Scope query to only active kitchens
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

@@ -268,7 +268,6 @@ class ConditionEvaluator
     {
         // Implement custom logic here
         // Could call external service, check database, etc.
-
         return true;
     }
 

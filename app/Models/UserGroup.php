@@ -9,6 +9,45 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string|null $description
+ * @property string $groupable_type
+ * @property int $groupable_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $parent_id
+ * @property int $level
+ * @property int|null $template_id
+ * @property bool $auto_sync_template
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, UserGroup> $children
+ * @property-read int|null $children_count
+ * @property-read UserGroup|null $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @property-read \App\Models\PermissionTemplate|null $template
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
+ * @property-read int|null $users_count
+ * @method static \Database\Factories\UserGroupFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereAutoSyncTemplate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereGroupableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereGroupableType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereSlug($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereTemplateId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class UserGroup extends Model
 {
     /** @use HasFactory<\Database\Factories\UserGroupFactory> */

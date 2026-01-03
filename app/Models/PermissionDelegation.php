@@ -11,9 +11,11 @@ use Illuminate\Support\Collection;
 
 /**
  * PermissionDelegation Model
- *
+ * 
  * Temporary permission delegation with re-delegation support
  *
+ * @author Noflaye Box Team
+ * @version 1.0.0
  * @property int $id
  * @property int $delegator_id
  * @property string $delegator_name
@@ -22,27 +24,50 @@ use Illuminate\Support\Collection;
  * @property int $permission_id
  * @property string $permission_slug
  * @property int|null $scope_id
- * @property \Carbon\Carbon $valid_from
- * @property \Carbon\Carbon $valid_until
+ * @property \Illuminate\Support\Carbon $valid_from
+ * @property \Illuminate\Support\Carbon $valid_until
  * @property bool $can_redelegate
  * @property int $max_redelegation_depth
  * @property string|null $reason
- * @property array|null $metadata
- * @property \Carbon\Carbon|null $revoked_at
+ * @property \Illuminate\Database\Eloquent\Casts\ArrayObject<array-key, mixed>|null $metadata
+ * @property \Illuminate\Support\Carbon|null $revoked_at
  * @property int|null $revoked_by
  * @property string|null $revocation_reason
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- *
- * @property-read User $delegator
- * @property-read User $delegatee
- * @property-read Permission $permission
- * @property-read Scope|null $scope
- * @property-read User|null $revoker
- * @property-read Collection $chain
- *
- * @author Noflaye Box Team
- * @version 1.0.0
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DelegationChain> $chain
+ * @property-read int|null $chain_count
+ * @property-read \App\Models\User $delegatee
+ * @property-read \App\Models\User $delegator
+ * @property-read \App\Models\Permission $permission
+ * @property-read \App\Models\User|null $revoker
+ * @property-read \App\Models\Scope|null $scope
+ * @method static Builder<static>|PermissionDelegation active()
+ * @method static Builder<static>|PermissionDelegation expired()
+ * @method static Builder<static>|PermissionDelegation newModelQuery()
+ * @method static Builder<static>|PermissionDelegation newQuery()
+ * @method static Builder<static>|PermissionDelegation query()
+ * @method static Builder<static>|PermissionDelegation revoked()
+ * @method static Builder<static>|PermissionDelegation whereCanRedelegate($value)
+ * @method static Builder<static>|PermissionDelegation whereCreatedAt($value)
+ * @method static Builder<static>|PermissionDelegation whereDelegateeId($value)
+ * @method static Builder<static>|PermissionDelegation whereDelegateeName($value)
+ * @method static Builder<static>|PermissionDelegation whereDelegatorId($value)
+ * @method static Builder<static>|PermissionDelegation whereDelegatorName($value)
+ * @method static Builder<static>|PermissionDelegation whereId($value)
+ * @method static Builder<static>|PermissionDelegation whereMaxRedelegationDepth($value)
+ * @method static Builder<static>|PermissionDelegation whereMetadata($value)
+ * @method static Builder<static>|PermissionDelegation wherePermissionId($value)
+ * @method static Builder<static>|PermissionDelegation wherePermissionSlug($value)
+ * @method static Builder<static>|PermissionDelegation whereReason($value)
+ * @method static Builder<static>|PermissionDelegation whereRevocationReason($value)
+ * @method static Builder<static>|PermissionDelegation whereRevokedAt($value)
+ * @method static Builder<static>|PermissionDelegation whereRevokedBy($value)
+ * @method static Builder<static>|PermissionDelegation whereScopeId($value)
+ * @method static Builder<static>|PermissionDelegation whereUpdatedAt($value)
+ * @method static Builder<static>|PermissionDelegation whereValidFrom($value)
+ * @method static Builder<static>|PermissionDelegation whereValidUntil($value)
+ * @mixin \Eloquent
  */
 class PermissionDelegation extends Model
 {
