@@ -38,7 +38,7 @@ class PermissionChecker
             ->where('active', true)
             ->first();
 
-        if (!$permission) {
+        if (! $permission) {
             return false;
         }
 
@@ -59,7 +59,7 @@ class PermissionChecker
         // 4. Vérifier permissions via rôles (PRIORITÉ 3)
         $rolePermission = $this->checkRolePermission($user, $permission, $scopeType, $scopeId);
 
-        if (!$rolePermission) {
+        if (! $rolePermission) {
             return false;
         }
 
@@ -90,7 +90,7 @@ class PermissionChecker
 
         $userPermission = $query->first();
 
-        if (!$userPermission) {
+        if (! $userPermission) {
             return null;
         }
 
@@ -116,10 +116,10 @@ class PermissionChecker
                     $q->whereNull('user_group_members.valid_until')
                         ->orWhere('user_group_members.valid_until', '>', now());
                 })
-                ->where(function ($q) {
-                    $q->whereNull('user_group_members.valid_from')
-                        ->orWhere('user_group_members.valid_from', '<=', now());
-                });
+                    ->where(function ($q) {
+                        $q->whereNull('user_group_members.valid_from')
+                            ->orWhere('user_group_members.valid_from', '<=', now());
+                    });
             })
             ->get();
 
@@ -203,7 +203,8 @@ class PermissionChecker
         // Admin peut gérer sauf les permissions système
         if ($user->hasRole('admin')) {
             $permission = Permission::where('slug', $permissionSlug)->first();
-            return $permission && !$permission->is_system;
+
+            return $permission && ! $permission->is_system;
         }
 
         // Autres utilisateurs ne peuvent pas gérer les permissions

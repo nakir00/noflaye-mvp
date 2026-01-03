@@ -12,6 +12,7 @@ use Filament\Resources\Pages\ListRecords;
  * List page for PermissionRequest resource
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class ListPermissionRequests extends ListRecords

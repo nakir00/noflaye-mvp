@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Schema;
  * Features: Hierarchical structure, scope support, auto-sync capabilities
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 return new class extends Migration

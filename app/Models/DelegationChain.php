@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\PermissionDelegation $delegation
  * @property-read \App\Models\PermissionDelegation|null $parentDelegation
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain query()
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain whereParentDelegationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DelegationChain whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class DelegationChain extends Model

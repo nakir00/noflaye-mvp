@@ -11,6 +11,7 @@ use Filament\Resources\Pages\ListRecords;
  * List page for PermissionAuditLog resource (readonly)
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class ListPermissionAuditLogs extends ListRecords

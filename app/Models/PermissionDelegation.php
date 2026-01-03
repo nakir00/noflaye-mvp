@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 
 /**
  * PermissionDelegation Model
- * 
+ *
  * Temporary permission delegation with re-delegation support
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
+ *
  * @property int $id
  * @property int $delegator_id
  * @property string $delegator_name
@@ -42,6 +43,7 @@ use Illuminate\Support\Collection;
  * @property-read \App\Models\Permission $permission
  * @property-read \App\Models\User|null $revoker
  * @property-read \App\Models\Scope|null $scope
+ *
  * @method static Builder<static>|PermissionDelegation active()
  * @method static Builder<static>|PermissionDelegation expired()
  * @method static Builder<static>|PermissionDelegation newModelQuery()
@@ -67,6 +69,7 @@ use Illuminate\Support\Collection;
  * @method static Builder<static>|PermissionDelegation whereUpdatedAt($value)
  * @method static Builder<static>|PermissionDelegation whereValidFrom($value)
  * @method static Builder<static>|PermissionDelegation whereValidUntil($value)
+ *
  * @mixin \Eloquent
  */
 class PermissionDelegation extends Model
@@ -201,7 +204,7 @@ class PermissionDelegation extends Model
     /**
      * Revoke this delegation
      */
-    public function revoke(User $revokedBy, string $reason = null): bool
+    public function revoke(User $revokedBy, ?string $reason = null): bool
     {
         return $this->update([
             'revoked_at' => now(),

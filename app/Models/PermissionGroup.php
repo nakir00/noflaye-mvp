@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read PermissionGroup|null $parent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
+ *
  * @method static \Database\Factories\PermissionGroupFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup newQuery()
@@ -34,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup whereParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PermissionGroup whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PermissionGroup extends Model

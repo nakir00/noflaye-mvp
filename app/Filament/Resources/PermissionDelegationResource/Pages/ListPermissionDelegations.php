@@ -12,6 +12,7 @@ use Filament\Resources\Pages\ListRecords;
  * List page for PermissionDelegation resource
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class ListPermissionDelegations extends ListRecords

@@ -30,6 +30,7 @@ use Illuminate\Support\Collection;
  * @property-read \App\Models\PermissionTemplate|null $template
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
+ *
  * @method static \Database\Factories\UserGroupFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup newQuery()
@@ -46,6 +47,7 @@ use Illuminate\Support\Collection;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereTemplateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserGroup whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class UserGroup extends Model

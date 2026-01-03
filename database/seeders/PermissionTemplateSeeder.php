@@ -76,8 +76,8 @@ class PermissionTemplateSeeder extends Seeder
         ])->pluck('id');
 
         if ($customerPermissions->isNotEmpty()) {
-            $customer->permissions()->sync($customerPermissions->mapWithKeys(fn($id) => [
-                $id => ['source' => 'direct', 'sort_order' => 1]
+            $customer->permissions()->sync($customerPermissions->mapWithKeys(fn ($id) => [
+                $id => ['source' => 'direct', 'sort_order' => 1],
             ]));
         }
 
@@ -106,8 +106,8 @@ class PermissionTemplateSeeder extends Seeder
         ])->pluck('id');
 
         if ($managerPermissions->isNotEmpty()) {
-            $manager->permissions()->sync($managerPermissions->mapWithKeys(fn($id) => [
-                $id => ['source' => 'direct', 'sort_order' => 1]
+            $manager->permissions()->sync($managerPermissions->mapWithKeys(fn ($id) => [
+                $id => ['source' => 'direct', 'sort_order' => 1],
             ]));
         }
 
@@ -115,8 +115,8 @@ class PermissionTemplateSeeder extends Seeder
         $adminPermissions = Permission::all()->pluck('id');
 
         if ($adminPermissions->isNotEmpty()) {
-            $admin->permissions()->sync($adminPermissions->mapWithKeys(fn($id) => [
-                $id => ['source' => 'direct', 'sort_order' => 1]
+            $admin->permissions()->sync($adminPermissions->mapWithKeys(fn ($id) => [
+                $id => ['source' => 'direct', 'sort_order' => 1],
             ]));
         }
 

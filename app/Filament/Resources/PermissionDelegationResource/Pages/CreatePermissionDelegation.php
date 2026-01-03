@@ -11,6 +11,7 @@ use Filament\Resources\Pages\CreateRecord;
  * Create page for PermissionDelegation resource
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class CreatePermissionDelegation extends CreateRecord

@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * PermissionRequest Model
- * 
+ *
  * Permission request/approval workflow
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
+ *
  * @property int $id
  * @property int $user_id
  * @property int $permission_id
@@ -32,6 +34,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read \App\Models\User|null $reviewer
  * @property-read \App\Models\Scope|null $scope
  * @property-read \App\Models\User $user
+ *
  * @method static Builder<static>|PermissionRequest approved()
  * @method static Builder<static>|PermissionRequest newModelQuery()
  * @method static Builder<static>|PermissionRequest newQuery()
@@ -51,6 +54,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|PermissionRequest whereStatus($value)
  * @method static Builder<static>|PermissionRequest whereUpdatedAt($value)
  * @method static Builder<static>|PermissionRequest whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class PermissionRequest extends Model
@@ -149,7 +153,7 @@ class PermissionRequest extends Model
     /**
      * Approve this request
      */
-    public function approve(User $reviewer, string $comment = null): bool
+    public function approve(User $reviewer, ?string $comment = null): bool
     {
         return $this->update([
             'status' => 'approved',
@@ -162,7 +166,7 @@ class PermissionRequest extends Model
     /**
      * Reject this request
      */
-    public function reject(User $reviewer, string $comment = null): bool
+    public function reject(User $reviewer, ?string $comment = null): bool
     {
         return $this->update([
             'status' => 'rejected',

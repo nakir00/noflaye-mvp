@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property array<array-key, mixed>|null $additional_settings
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PanelConfiguration newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PanelConfiguration newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PanelConfiguration query()
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PanelConfiguration whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PanelConfiguration wherePanelId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PanelConfiguration whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PanelConfiguration extends Model

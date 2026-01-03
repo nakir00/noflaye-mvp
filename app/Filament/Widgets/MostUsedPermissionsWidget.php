@@ -13,13 +13,14 @@ use Filament\Widgets\TableWidget as BaseWidget;
  * Table showing most frequently assigned permissions
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class MostUsedPermissionsWidget extends BaseWidget
 {
     protected static ?int $sort = 3;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     /**
      * Get the table for the widget

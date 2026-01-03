@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Scope Model
- * 
+ *
  * Unified scope management for permissions, templates, and groups
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
+ *
  * @property int $id
  * @property string $scopable_type
  * @property int $scopable_id
@@ -24,6 +26,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read Model|\Eloquent $scopable
+ *
  * @method static Builder<static>|Scope active()
  * @method static Builder<static>|Scope byKey(string $key)
  * @method static Builder<static>|Scope byType(string $type)
@@ -42,6 +45,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|Scope whereUpdatedAt($value)
  * @method static Builder<static>|Scope withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|Scope withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class Scope extends Model

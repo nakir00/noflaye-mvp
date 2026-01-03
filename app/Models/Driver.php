@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property-read int|null $user_groups_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver query()
@@ -49,6 +50,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereVehicleNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Driver whereVehicleType($value)
+ *
  * @mixin \Eloquent
  */
 class Driver extends Model implements HasName
@@ -132,10 +134,10 @@ class Driver extends Model implements HasName
     /**
      * Get the driver email.
      */
-    protected function email(): Attribute | string | null
+    protected function email(): Attribute|string|null
     {
         return Attribute::make(
-            get: fn (?string $value): string | null => $value ? strtolower(trim($value)) : null,
+            get: fn (?string $value): ?string => $value ? strtolower(trim($value)) : null,
             set: fn (?string $value) => $value ? strtolower(trim($value)) : null,
         );
     }
@@ -258,7 +260,7 @@ class Driver extends Model implements HasName
     /**
      * Scope query to only active drivers
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
@@ -269,12 +271,12 @@ class Driver extends Model implements HasName
     /**
      * Scope query to only available drivers
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeAvailable($query)
     {
         return $query->where('is_available', true)
-                     ->where('is_active', true);
+            ->where('is_active', true);
     }
 }

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Schema;
  * Features: Auto-sync, validity periods, version tracking
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 return new class extends Migration

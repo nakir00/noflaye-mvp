@@ -12,6 +12,7 @@ use Filament\Resources\Pages\EditRecord;
  * Edit page for PermissionRequest resource
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class EditPermissionRequest extends EditRecord

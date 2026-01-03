@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * PermissionTemplateVersion Model
- * 
+ *
  * Version control for permission templates with snapshots
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
+ *
  * @property int $id
  * @property int $template_id
  * @property int $version
@@ -37,6 +39,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read \App\Models\User|null $creator
  * @property-read \App\Models\User|null $publisher
  * @property-read \App\Models\PermissionTemplate $template
+ *
  * @method static Builder<static>|PermissionTemplateVersion latest()
  * @method static Builder<static>|PermissionTemplateVersion newModelQuery()
  * @method static Builder<static>|PermissionTemplateVersion newQuery()
@@ -64,6 +67,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|PermissionTemplateVersion whereVersion($value)
  * @method static Builder<static>|PermissionTemplateVersion whereVersionName($value)
  * @method static Builder<static>|PermissionTemplateVersion whereWildcardsSnapshot($value)
+ *
  * @mixin \Eloquent
  */
 class PermissionTemplateVersion extends Model

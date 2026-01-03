@@ -14,6 +14,7 @@ use Illuminate\Notifications\Notification;
  * Notify user that a delegation has been revoked
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class DelegationRevokedNotification extends Notification implements ShouldQueue
@@ -42,18 +43,18 @@ class DelegationRevokedNotification extends Notification implements ShouldQueue
     {
         $message = (new MailMessage)
             ->subject('Permission Delegation Revoked')
-            ->greeting('Hello ' . $notifiable->name . ',')
+            ->greeting('Hello '.$notifiable->name.',')
             ->line('A permission delegation has been revoked:')
-            ->line('**Permission:** ' . $this->delegation->permission_slug)
-            ->line('**Delegated By:** ' . $this->delegation->delegator_name)
-            ->line('**Revoked At:** ' . $this->delegation->revoked_at->format('Y-m-d H:i'));
+            ->line('**Permission:** '.$this->delegation->permission_slug)
+            ->line('**Delegated By:** '.$this->delegation->delegator_name)
+            ->line('**Revoked At:** '.$this->delegation->revoked_at->format('Y-m-d H:i'));
 
         if ($this->delegation->scope) {
-            $message->line('**Scope:** ' . $this->delegation->scope->getDisplayName());
+            $message->line('**Scope:** '.$this->delegation->scope->getDisplayName());
         }
 
         if ($this->delegation->revocation_reason) {
-            $message->line('**Reason:** ' . $this->delegation->revocation_reason);
+            $message->line('**Reason:** '.$this->delegation->revocation_reason);
         }
 
         $message->line('You no longer have access to this delegated permission.')
@@ -78,7 +79,7 @@ class DelegationRevokedNotification extends Notification implements ShouldQueue
             'revocation_reason' => $this->delegation->revocation_reason,
             'scope_id' => $this->delegation->scope_id,
             'scope_name' => $this->delegation->scope?->getDisplayName(),
-            'message' => 'Your delegation for "' . $this->delegation->permission_slug . '" has been revoked.',
+            'message' => 'Your delegation for "'.$this->delegation->permission_slug.'" has been revoked.',
         ];
     }
 }

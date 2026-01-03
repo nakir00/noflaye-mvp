@@ -13,10 +13,9 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Form;
+use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +27,7 @@ use UnitEnum;
  * Filament resource for managing permission delegations
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionDelegationResource extends Resource
@@ -155,6 +155,7 @@ class PermissionDelegationResource extends Resource
                         if ($record->valid_until < now()) {
                             return 'expired';
                         }
+
                         return 'active';
                     })
                     ->color(fn (string $state): string => match ($state) {
@@ -248,7 +249,7 @@ class PermissionDelegationResource extends Resource
                     ->visible(fn (PermissionDelegation $record) => $record->isActive()),
 
                 DeleteAction::make()
-                    ->visible(fn (PermissionDelegation $record) => !$record->isActive()),
+                    ->visible(fn (PermissionDelegation $record) => ! $record->isActive()),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

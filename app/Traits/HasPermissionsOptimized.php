@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
  * Provides optimized permission checking methods for User model
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 trait HasPermissionsOptimized
@@ -20,9 +21,8 @@ trait HasPermissionsOptimized
     /**
      * Check if user can perform action
      *
-     * @param string $permission Permission slug
-     * @param Scope|int|string|null $scope Scope (instance, id, or key)
-     * @return bool
+     * @param  string  $permission  Permission slug
+     * @param  Scope|int|string|null  $scope  Scope (instance, id, or key)
      */
     public function can($permission, $scope = null): bool
     {
@@ -37,8 +37,7 @@ trait HasPermissionsOptimized
     /**
      * Check if user has template assigned
      *
-     * @param string $templateSlug Template slug
-     * @return bool
+     * @param  string  $templateSlug  Template slug
      */
     public function hasTemplate(string $templateSlug): bool
     {
@@ -50,9 +49,8 @@ trait HasPermissionsOptimized
     /**
      * Check if user has active delegation for permission
      *
-     * @param string $permission Permission slug
-     * @param Scope|null $scope Scope context
-     * @return bool
+     * @param  string  $permission  Permission slug
+     * @param  Scope|null  $scope  Scope context
      */
     public function hasDelegation(string $permission, ?Scope $scope = null): bool
     {
@@ -64,7 +62,7 @@ trait HasPermissionsOptimized
     /**
      * Get all user permissions with scope
      *
-     * @param Scope|int|string|null $scope Scope filter
+     * @param  Scope|int|string|null  $scope  Scope filter
      * @return Collection<Permission>
      */
     public function getAllPermissions($scope = null): Collection
@@ -79,9 +77,8 @@ trait HasPermissionsOptimized
     /**
      * Check if user can perform any of the given permissions
      *
-     * @param array $permissions Array of permission slugs
-     * @param Scope|null $scope Scope context
-     * @return bool
+     * @param  array  $permissions  Array of permission slugs
+     * @param  Scope|null  $scope  Scope context
      */
     public function canAny(array $permissions, $scope = null): bool
     {
@@ -97,14 +94,13 @@ trait HasPermissionsOptimized
     /**
      * Check if user can perform all of the given permissions
      *
-     * @param array $permissions Array of permission slugs
-     * @param Scope|null $scope Scope context
-     * @return bool
+     * @param  array  $permissions  Array of permission slugs
+     * @param  Scope|null  $scope  Scope context
      */
     public function canAll(array $permissions, $scope = null): bool
     {
         foreach ($permissions as $permission) {
-            if (!$this->can($permission, $scope)) {
+            if (! $this->can($permission, $scope)) {
                 return false;
             }
         }
@@ -115,8 +111,7 @@ trait HasPermissionsOptimized
     /**
      * Resolve scope from various inputs
      *
-     * @param Scope|int|string|null $scope
-     * @return Scope|null
+     * @param  Scope|int|string|null  $scope
      */
     private function resolveScope($scope): ?Scope
     {

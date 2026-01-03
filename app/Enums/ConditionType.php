@@ -8,6 +8,7 @@ namespace App\Enums;
  * Purpose: Define condition types for contextual permissions
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 enum ConditionType: string
@@ -93,7 +94,7 @@ enum ConditionType: string
      */
     public function description(): string
     {
-        return match($this) {
+        return match ($this) {
             self::TIME_RANGE => 'Allow only during specific hours (e.g., 9:00-18:00)',
             self::DAYS => 'Allow only on specific days of week',
             self::DATE_RANGE => 'Allow only between specific dates',
@@ -118,7 +119,7 @@ enum ConditionType: string
      */
     public function exampleValue(): mixed
     {
-        return match($this) {
+        return match ($this) {
             self::TIME_RANGE => ['start' => '09:00', 'end' => '18:00'],
             self::DAYS => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
             self::DATE_RANGE => ['start' => '2025-01-01', 'end' => '2025-12-31'],
@@ -143,7 +144,7 @@ enum ConditionType: string
      */
     public function icon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::TIME_RANGE, self::DAYS, self::DATE_RANGE => 'heroicon-o-clock',
             self::IP_WHITELIST, self::IP_BLACKLIST => 'heroicon-o-globe-alt',
             self::REQUIRES_2FA => 'heroicon-o-shield-check',
@@ -159,7 +160,7 @@ enum ConditionType: string
      */
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::TIME_RANGE, self::DAYS, self::DATE_RANGE => 'info',
             self::IP_WHITELIST => 'success',
             self::IP_BLACKLIST => 'danger',
@@ -175,18 +176,18 @@ enum ConditionType: string
      */
     public function validateValue(mixed $value): bool
     {
-        return match($this) {
+        return match ($this) {
             self::TIME_RANGE => is_array($value) && isset($value['start']) && isset($value['end']),
-            self::DAYS => is_array($value) && !empty($value),
+            self::DAYS => is_array($value) && ! empty($value),
             self::DATE_RANGE => is_array($value) && isset($value['start']) && isset($value['end']),
 
-            self::IP_WHITELIST, self::IP_BLACKLIST => is_array($value) && !empty($value),
+            self::IP_WHITELIST, self::IP_BLACKLIST => is_array($value) && ! empty($value),
 
             self::REQUIRES_2FA, self::REQUIRES_EMAIL_VERIFIED => is_bool($value),
 
             self::MAX_AMOUNT, self::MIN_AMOUNT => is_numeric($value) && $value > 0,
 
-            self::USER_ATTRIBUTES => is_array($value) && !empty($value),
+            self::USER_ATTRIBUTES => is_array($value) && ! empty($value),
 
             self::CUSTOM => true, // Always valid for custom
         };

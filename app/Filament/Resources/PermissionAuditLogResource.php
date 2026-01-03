@@ -24,6 +24,7 @@ use UnitEnum;
  * Filament resource for viewing permission audit logs (readonly)
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionAuditLogResource extends Resource
@@ -120,8 +121,7 @@ class PermissionAuditLogResource extends Resource
                             ->label('User Name'),
                     ])
                     ->query(function ($query, array $data) {
-                        return $query->when($data['user_name'], fn ($query, $name) =>
-                            $query->where('user_name', 'like', "%{$name}%")
+                        return $query->when($data['user_name'], fn ($query, $name) => $query->where('user_name', 'like', "%{$name}%")
                         );
                     }),
 
@@ -131,8 +131,7 @@ class PermissionAuditLogResource extends Resource
                             ->label('Permission Slug'),
                     ])
                     ->query(function ($query, array $data) {
-                        return $query->when($data['permission_slug'], fn ($query, $slug) =>
-                            $query->where('permission_slug', 'like', "%{$slug}%")
+                        return $query->when($data['permission_slug'], fn ($query, $slug) => $query->where('permission_slug', 'like', "%{$slug}%")
                         );
                     }),
 
@@ -142,8 +141,7 @@ class PermissionAuditLogResource extends Resource
                             ->label('Performed By'),
                     ])
                     ->query(function ($query, array $data) {
-                        return $query->when($data['performed_by_name'], fn ($query, $name) =>
-                            $query->where('performed_by_name', 'like', "%{$name}%")
+                        return $query->when($data['performed_by_name'], fn ($query, $name) => $query->where('performed_by_name', 'like', "%{$name}%")
                         );
                     }),
 
@@ -156,11 +154,9 @@ class PermissionAuditLogResource extends Resource
                     ])
                     ->query(function ($query, array $data) {
                         return $query
-                            ->when($data['created_from'], fn ($query, $date) =>
-                                $query->whereDate('created_at', '>=', $date)
+                            ->when($data['created_from'], fn ($query, $date) => $query->whereDate('created_at', '>=', $date)
                             )
-                            ->when($data['created_until'], fn ($query, $date) =>
-                                $query->whereDate('created_at', '<=', $date)
+                            ->when($data['created_until'], fn ($query, $date) => $query->whereDate('created_at', '<=', $date)
                             );
                     }),
 
@@ -170,8 +166,7 @@ class PermissionAuditLogResource extends Resource
                             ->label('IP Address'),
                     ])
                     ->query(function ($query, array $data) {
-                        return $query->when($data['ip_address'], fn ($query, $ip) =>
-                            $query->where('ip_address', 'like', "%{$ip}%")
+                        return $query->when($data['ip_address'], fn ($query, $ip) => $query->where('ip_address', 'like', "%{$ip}%")
                         );
                     }),
             ])
@@ -204,7 +199,7 @@ class PermissionAuditLogResource extends Resource
 
                         return response()->streamDownload(function () use ($csv) {
                             echo $csv;
-                        }, 'audit-log-' . $record->id . '.csv');
+                        }, 'audit-log-'.$record->id.'.csv');
                     }),
             ])
             ->toolbarActions([
@@ -227,12 +222,12 @@ class PermissionAuditLogResource extends Resource
                                     $record->ip_address ?? 'N/A',
                                     $record->created_at->format('Y-m-d H:i:s'),
                                     str_replace(',', ';', $record->reason ?? ''),
-                                ]) . "\n";
+                                ])."\n";
                             }
 
                             return response()->streamDownload(function () use ($csv) {
                                 echo $csv;
-                            }, 'audit-logs-export-' . now()->format('Y-m-d-His') . '.csv');
+                            }, 'audit-logs-export-'.now()->format('Y-m-d-His').'.csv');
                         }),
                 ]),
             ]);

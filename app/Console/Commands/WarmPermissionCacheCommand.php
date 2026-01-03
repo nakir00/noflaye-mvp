@@ -12,6 +12,7 @@ use Illuminate\Console\Command;
  * Pre-warm permission cache for all users
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class WarmPermissionCacheCommand extends Command

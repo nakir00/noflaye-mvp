@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * User Permission Model
- * 
+ *
  * Represents the pivot table between users and permissions
  * as a full Eloquent model to enable queries in widgets/stats
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
+ *
  * @property int $id
  * @property int $user_id
  * @property int $permission_id
@@ -26,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Permission $permission
  * @property-read \App\Models\Scope|null $scope
  * @property-read \App\Models\User $user
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission expired()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission fromSource(string $source)
@@ -41,6 +44,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission whereSourceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserPermission whereUserId($value)
+ *
  * @mixin \Eloquent
  */
 class UserPermission extends Model
@@ -124,7 +128,7 @@ class UserPermission extends Model
      */
     public function isActive(): bool
     {
-        return !$this->isExpired();
+        return ! $this->isExpired();
     }
 
     /**
@@ -134,7 +138,7 @@ class UserPermission extends Model
     {
         return $query->where(function ($q) {
             $q->whereNull('expires_at')
-              ->orWhere('expires_at', '>', now());
+                ->orWhere('expires_at', '>', now());
         });
     }
 
@@ -144,7 +148,7 @@ class UserPermission extends Model
     public function scopeExpired($query)
     {
         return $query->whereNotNull('expires_at')
-                     ->where('expires_at', '<=', now());
+            ->where('expires_at', '<=', now());
     }
 
     /**

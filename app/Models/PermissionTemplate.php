@@ -2,24 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Spatie\Activitylog\LogsActivity;
 use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
 
 /**
  * PermissionTemplate Model
- * 
+ *
  * Templates for grouping permissions (replaces roles)
  * Supports hierarchy, wildcards, and versioning
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
+ *
  * @property int $id
  * @property string $name
  * @property string $slug
@@ -48,6 +49,7 @@ use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
  * @property-read int|null $versions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PermissionWildcard> $wildcards
  * @property-read int|null $wildcards_count
+ *
  * @method static Builder<static>|PermissionTemplate active()
  * @method static Builder<static>|PermissionTemplate newModelQuery()
  * @method static Builder<static>|PermissionTemplate newQuery()
@@ -73,12 +75,13 @@ use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
  * @method static Builder<static>|PermissionTemplate whereUpdatedAt($value)
  * @method static Builder<static>|PermissionTemplate withTrashed(bool $withTrashed = true)
  * @method static Builder<static>|PermissionTemplate withoutTrashed()
+ *
  * @mixin \Eloquent
  */
 class PermissionTemplate extends Model
 {
-    use SoftDeletes;
     use LogsActivityTrait;
+    use SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -211,7 +214,7 @@ class PermissionTemplate extends Model
      */
     public function syncUsers(): int
     {
-        if (!$this->auto_sync_users) {
+        if (! $this->auto_sync_users) {
             return 0;
         }
 

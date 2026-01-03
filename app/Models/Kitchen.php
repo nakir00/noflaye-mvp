@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property-read int|null $user_groups_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen query()
@@ -47,6 +48,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Kitchen whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Kitchen extends Model implements HasName
@@ -244,8 +246,6 @@ class Kitchen extends Model implements HasName
 
     /**
      * Get managers of this kitchen
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function managers(): BelongsToMany
     {
@@ -256,8 +256,6 @@ class Kitchen extends Model implements HasName
 
     /**
      * Get all staff members of this kitchen
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function staff(): BelongsToMany
     {
@@ -269,7 +267,7 @@ class Kitchen extends Model implements HasName
     /**
      * Scope query to only active kitchens
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)

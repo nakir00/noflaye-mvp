@@ -8,6 +8,7 @@ namespace App\Enums;
  * Purpose: Define standard CRUD and management actions for permissions
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 enum PermissionAction: string
@@ -117,7 +118,7 @@ enum PermissionAction: string
      */
     public function description(): string
     {
-        return match($this) {
+        return match ($this) {
             self::CREATE => 'Create new resources',
             self::READ => 'Read resource details',
             self::UPDATE => 'Update existing resources',
@@ -138,7 +139,7 @@ enum PermissionAction: string
      */
     public function icon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::CREATE => 'heroicon-o-plus-circle',
             self::READ => 'heroicon-o-eye',
             self::UPDATE => 'heroicon-o-pencil',
@@ -159,7 +160,7 @@ enum PermissionAction: string
      */
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::CREATE => 'success',
             self::READ, self::VIEW, self::LIST => 'info',
             self::UPDATE => 'warning',

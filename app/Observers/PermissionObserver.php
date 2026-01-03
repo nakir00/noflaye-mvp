@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
  * Handle Permission lifecycle events
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionObserver
@@ -28,7 +29,7 @@ class PermissionObserver
     public function creating(Permission $permission): void
     {
         // Auto-generate slug if not provided
-        if (empty($permission->slug) && !empty($permission->name)) {
+        if (empty($permission->slug) && ! empty($permission->name)) {
             $permission->slug = Str::slug($permission->name);
         }
     }

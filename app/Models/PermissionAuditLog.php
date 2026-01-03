@@ -3,18 +3,20 @@
 namespace App\Models;
 
 use App\Enums\AuditAction;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * PermissionAuditLog Model
- * 
+ *
  * Comprehensive audit trail for permission changes
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
+ *
  * @property int $id
  * @property int|null $user_id
  * @property string|null $user_name
@@ -36,6 +38,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property-read \App\Models\User|null $performer
  * @property-read \App\Models\Scope|null $scope
  * @property-read \App\Models\User|null $user
+ *
  * @method static Builder<static>|PermissionAuditLog byAction(string $action)
  * @method static Builder<static>|PermissionAuditLog byPermission(string $permissionSlug)
  * @method static Builder<static>|PermissionAuditLog byUser(int $userId)
@@ -61,6 +64,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static Builder<static>|PermissionAuditLog whereUserEmail($value)
  * @method static Builder<static>|PermissionAuditLog whereUserId($value)
  * @method static Builder<static>|PermissionAuditLog whereUserName($value)
+ *
  * @mixin \Eloquent
  */
 class PermissionAuditLog extends Model

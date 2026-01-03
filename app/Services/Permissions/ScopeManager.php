@@ -4,8 +4,8 @@ namespace App\Services\Permissions;
 
 use App\Models\Scope;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * ScopeManager Service
@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
  * Centralized scope management for the permission system
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class ScopeManager
@@ -20,9 +21,8 @@ class ScopeManager
     /**
      * Create or retrieve scope for a given entity
      *
-     * @param Model $entity The entity to scope (Shop, Kitchen, etc.)
-     * @param bool $activate Whether to activate if deactivated
-     * @return Scope
+     * @param  Model  $entity  The entity to scope (Shop, Kitchen, etc.)
+     * @param  bool  $activate  Whether to activate if deactivated
      */
     public function createScopeForEntity(Model $entity, bool $activate = true): Scope
     {
@@ -35,7 +35,7 @@ class ScopeManager
 
         if ($scope) {
             // Reactivate if needed
-            if ($activate && !$scope->is_active) {
+            if ($activate && ! $scope->is_active) {
                 $scope->activate();
             }
 
@@ -55,8 +55,7 @@ class ScopeManager
     /**
      * Find or create scope by key
      *
-     * @param string $scopeKey Format: "type:id" (e.g., "shop:5")
-     * @return Scope|null
+     * @param  string  $scopeKey  Format: "type:id" (e.g., "shop:5")
      */
     public function findOrCreateScope(string $scopeKey): ?Scope
     {
@@ -73,20 +72,20 @@ class ScopeManager
             // Parse scope key
             [$type, $id] = $this->parseScopeKey($scopeKey);
 
-            if (!$type || !$id) {
+            if (! $type || ! $id) {
                 return null;
             }
 
             // Find entity
             $modelClass = $this->getModelClass($type);
 
-            if (!$modelClass || !class_exists($modelClass)) {
+            if (! $modelClass || ! class_exists($modelClass)) {
                 return null;
             }
 
             $entity = $modelClass::find($id);
 
-            if (!$entity) {
+            if (! $entity) {
                 return null;
             }
 
@@ -96,9 +95,6 @@ class ScopeManager
 
     /**
      * Get scope by ID with caching
-     *
-     * @param int $scopeId
-     * @return Scope|null
      */
     public function getScopeById(int $scopeId): ?Scope
     {
@@ -111,9 +107,6 @@ class ScopeManager
 
     /**
      * Deactivate a scope
-     *
-     * @param Scope $scope
-     * @return bool
      */
     public function deactivateScope(Scope $scope): bool
     {
@@ -131,8 +124,8 @@ class ScopeManager
     /**
      * Get all scopes by type
      *
-     * @param string $type Entity type (shop, kitchen, etc.)
-     * @param bool $activeOnly Only active scopes
+     * @param  string  $type  Entity type (shop, kitchen, etc.)
+     * @param  bool  $activeOnly  Only active scopes
      * @return Collection<Scope>
      */
     public function getScopesByType(string $type, bool $activeOnly = true): Collection
@@ -151,7 +144,6 @@ class ScopeManager
     /**
      * Bulk create scopes for entities
      *
-     * @param Collection $entities
      * @return Collection<Scope>
      */
     public function bulkCreateScopes(Collection $entities): Collection
@@ -167,21 +159,16 @@ class ScopeManager
 
     /**
      * Make scope key from entity
-     *
-     * @param Model $entity
-     * @return string
      */
     private function makeScopeKey(Model $entity): string
     {
         $type = strtolower(class_basename($entity));
+
         return "{$type}:{$entity->id}";
     }
 
     /**
      * Get scope name from entity
-     *
-     * @param Model $entity
-     * @return string|null
      */
     private function getScopeName(Model $entity): ?string
     {
@@ -191,7 +178,6 @@ class ScopeManager
     /**
      * Parse scope key into type and id
      *
-     * @param string $scopeKey
      * @return array [type, id]
      */
     private function parseScopeKey(string $scopeKey): array
@@ -207,13 +193,10 @@ class ScopeManager
 
     /**
      * Get model class from type
-     *
-     * @param string $type
-     * @return string|null
      */
     private function getModelClass(string $type): ?string
     {
-        return match($type) {
+        return match ($type) {
             'shop' => \App\Models\Shop::class,
             'kitchen' => \App\Models\Kitchen::class,
             'driver' => \App\Models\Driver::class,
@@ -226,8 +209,6 @@ class ScopeManager
 
     /**
      * Invalidate all scope caches
-     *
-     * @return void
      */
     public function invalidateAllCaches(): void
     {

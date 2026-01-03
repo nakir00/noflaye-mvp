@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Schema;
  * Replaces: scope_type/scope_id pairs with single scope_id reference
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 return new class extends Migration

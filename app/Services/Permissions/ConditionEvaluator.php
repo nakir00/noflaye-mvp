@@ -2,10 +2,10 @@
 
 namespace App\Services\Permissions;
 
-use App\Models\User;
 use App\Enums\ConditionType;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 /**
  * ConditionEvaluator Service
@@ -13,6 +13,7 @@ use Carbon\Carbon;
  * Evaluates contextual conditions for permission grants
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class ConditionEvaluator
@@ -20,9 +21,9 @@ class ConditionEvaluator
     /**
      * Evaluate all conditions
      *
-     * @param array $conditions Array of conditions to evaluate
-     * @param User $user The user context
-     * @param Request|null $request The request context
+     * @param  array  $conditions  Array of conditions to evaluate
+     * @param  User  $user  The user context
+     * @param  Request|null  $request  The request context
      * @return bool True if all conditions pass
      */
     public function evaluate(array $conditions, User $user, ?Request $request = null): bool
@@ -35,7 +36,7 @@ class ConditionEvaluator
             try {
                 $conditionType = ConditionType::from($type);
 
-                if (!$this->evaluateCondition($conditionType, $value, $user, $request)) {
+                if (! $this->evaluateCondition($conditionType, $value, $user, $request)) {
                     return false;
                 }
             } catch (\ValueError $e) {
@@ -49,12 +50,6 @@ class ConditionEvaluator
 
     /**
      * Evaluate single condition
-     *
-     * @param ConditionType $type
-     * @param mixed $value
-     * @param User $user
-     * @param Request|null $request
-     * @return bool
      */
     private function evaluateCondition(
         ConditionType $type,
@@ -62,7 +57,7 @@ class ConditionEvaluator
         User $user,
         ?Request $request
     ): bool {
-        return match($type) {
+        return match ($type) {
             ConditionType::TIME_RANGE => $this->evaluateTimeRange($value),
             ConditionType::DAYS => $this->evaluateDays($value),
             ConditionType::DATE_RANGE => $this->evaluateDateRange($value),
@@ -80,8 +75,7 @@ class ConditionEvaluator
     /**
      * Evaluate time range condition
      *
-     * @param array $value ['start' => '09:00', 'end' => '18:00']
-     * @return bool
+     * @param  array  $value  ['start' => '09:00', 'end' => '18:00']
      */
     private function evaluateTimeRange(array $value): bool
     {
@@ -95,8 +89,7 @@ class ConditionEvaluator
     /**
      * Evaluate days condition
      *
-     * @param array $value ['monday', 'tuesday', ...]
-     * @return bool
+     * @param  array  $value  ['monday', 'tuesday', ...]
      */
     private function evaluateDays(array $value): bool
     {
@@ -108,8 +101,7 @@ class ConditionEvaluator
     /**
      * Evaluate date range condition
      *
-     * @param array $value ['start' => '2025-01-01', 'end' => '2025-12-31']
-     * @return bool
+     * @param  array  $value  ['start' => '2025-01-01', 'end' => '2025-12-31']
      */
     private function evaluateDateRange(array $value): bool
     {
@@ -123,13 +115,11 @@ class ConditionEvaluator
     /**
      * Evaluate IP whitelist condition
      *
-     * @param array $value ['192.168.1.0/24', '10.0.0.1']
-     * @param Request|null $request
-     * @return bool
+     * @param  array  $value  ['192.168.1.0/24', '10.0.0.1']
      */
     private function evaluateIpWhitelist(array $value, ?Request $request): bool
     {
-        if (!$request) {
+        if (! $request) {
             return false;
         }
 
@@ -147,13 +137,11 @@ class ConditionEvaluator
     /**
      * Evaluate IP blacklist condition
      *
-     * @param array $value ['203.0.113.0/24']
-     * @param Request|null $request
-     * @return bool
+     * @param  array  $value  ['203.0.113.0/24']
      */
     private function evaluateIpBlacklist(array $value, ?Request $request): bool
     {
-        if (!$request) {
+        if (! $request) {
             return true; // No request, can't be blacklisted
         }
 
@@ -170,14 +158,10 @@ class ConditionEvaluator
 
     /**
      * Evaluate 2FA requirement
-     *
-     * @param bool $value
-     * @param User $user
-     * @return bool
      */
     private function evaluateRequires2FA(bool $value, User $user): bool
     {
-        if (!$value) {
+        if (! $value) {
             return true;
         }
 
@@ -186,14 +170,10 @@ class ConditionEvaluator
 
     /**
      * Evaluate email verification requirement
-     *
-     * @param bool $value
-     * @param User $user
-     * @return bool
      */
     private function evaluateEmailVerified(bool $value, User $user): bool
     {
-        if (!$value) {
+        if (! $value) {
             return true;
         }
 
@@ -202,14 +182,10 @@ class ConditionEvaluator
 
     /**
      * Evaluate max amount condition
-     *
-     * @param float $value
-     * @param Request|null $request
-     * @return bool
      */
     private function evaluateMaxAmount(float $value, ?Request $request): bool
     {
-        if (!$request) {
+        if (! $request) {
             return true;
         }
 
@@ -220,14 +196,10 @@ class ConditionEvaluator
 
     /**
      * Evaluate min amount condition
-     *
-     * @param float $value
-     * @param Request|null $request
-     * @return bool
      */
     private function evaluateMinAmount(float $value, ?Request $request): bool
     {
-        if (!$request) {
+        if (! $request) {
             return true;
         }
 
@@ -239,9 +211,7 @@ class ConditionEvaluator
     /**
      * Evaluate user attributes condition
      *
-     * @param array $value ['subscription' => 'premium', 'account_age_days' => 90]
-     * @param User $user
-     * @return bool
+     * @param  array  $value  ['subscription' => 'premium', 'account_age_days' => 90]
      */
     private function evaluateUserAttributes(array $value, User $user): bool
     {
@@ -258,11 +228,6 @@ class ConditionEvaluator
 
     /**
      * Evaluate custom condition
-     *
-     * @param array $value
-     * @param User $user
-     * @param Request|null $request
-     * @return bool
      */
     private function evaluateCustom(array $value, User $user, ?Request $request): bool
     {
@@ -273,10 +238,6 @@ class ConditionEvaluator
 
     /**
      * Check if IP matches pattern (supports CIDR)
-     *
-     * @param string $ip
-     * @param string $pattern
-     * @return bool
      */
     private function ipMatches(string $ip, string $pattern): bool
     {

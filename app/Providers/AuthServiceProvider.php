@@ -16,7 +16,11 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        \App\Models\User::class => \App\Policies\UserPolicy::class,
+        \App\Models\Shop::class => \App\Policies\ShopPolicy::class,
+        \App\Models\Kitchen::class => \App\Policies\KitchenPolicy::class,
+        \App\Models\Permission::class => \App\Policies\PermissionPolicy::class,
+        \App\Models\PermissionTemplate::class => \App\Policies\TemplatePolicy::class,
     ];
 
     /**
@@ -105,8 +109,8 @@ class AuthServiceProvider extends ServiceProvider
 
         // Get the action (first part or first two parts)
         $action = $parts[0];
-        if (isset($parts[1]) && in_array($parts[0] . '_' . $parts[1], ['view_any', 'force_delete'])) {
-            $action = $parts[0] . '_' . $parts[1];
+        if (isset($parts[1]) && in_array($parts[0].'_'.$parts[1], ['view_any', 'force_delete'])) {
+            $action = $parts[0].'_'.$parts[1];
             array_shift($parts); // Remove first part
         }
         array_shift($parts); // Remove action part

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Schema;
  * Features: Status tracking, review process, audit trail
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 return new class extends Migration

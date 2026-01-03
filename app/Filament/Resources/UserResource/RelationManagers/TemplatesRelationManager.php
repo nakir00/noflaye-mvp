@@ -21,6 +21,7 @@ use Filament\Tables\Table;
  * Manage user permission templates
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class TemplatesRelationManager extends RelationManager

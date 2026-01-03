@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Rate limit permission checks per user
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionRateLimiter
@@ -22,12 +23,9 @@ class PermissionRateLimiter
     /**
      * Handle an incoming request
      *
-     * @param Request $request
-     * @param Closure $next
-     * @param string $permission Permission being checked
-     * @param int $maxAttempts Maximum attempts (default: 60)
-     * @param int $decayMinutes Decay time in minutes (default: 1)
-     * @return Response
+     * @param  string  $permission  Permission being checked
+     * @param  int  $maxAttempts  Maximum attempts (default: 60)
+     * @param  int  $decayMinutes  Decay time in minutes (default: 1)
      */
     public function handle(
         Request $request,
@@ -38,7 +36,7 @@ class PermissionRateLimiter
     ): Response {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return $next($request);
         }
 

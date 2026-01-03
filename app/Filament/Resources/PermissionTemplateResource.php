@@ -10,11 +10,10 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -26,6 +25,7 @@ use UnitEnum;
  * Filament resource for managing permission templates
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionTemplateResource extends Resource
@@ -48,8 +48,7 @@ class PermissionTemplateResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn ($state, Set $set) =>
-                                $set('slug', Str::slug($state))
+                            ->afterStateUpdated(fn ($state, Set $set) => $set('slug', Str::slug($state))
                             ),
 
                         Forms\Components\TextInput::make('slug')

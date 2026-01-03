@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
-use Spatie\Activitylog\LogsActivity;
 use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
 
 /**
@@ -54,6 +53,7 @@ use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
  * @property-read int|null $templates_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserGroup> $userGroups
  * @property-read int|null $user_groups_count
+ *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
@@ -67,12 +67,13 @@ use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePrimaryTemplateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class User extends Authenticatable implements FilamentUser, HasTenants
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, LogsActivityTrait;
+    use HasFactory, LogsActivityTrait, Notifiable;
 
     protected $fillable = [
         'name',
@@ -301,7 +302,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         $userTemplateSlugs = $this->getTemplateSlugs();
 
         foreach ($templateSlugs as $slug) {
-            if (!in_array($slug, $userTemplateSlugs)) {
+            if (! in_array($slug, $userTemplateSlugs)) {
                 return false;
             }
         }
@@ -351,8 +352,8 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     /**
      * Vérifie si l'utilisateur a une permission
      *
-     * @param string $permissionSlug Format: 'resource.action'
-     * @param Scope|int|null $scope Scope instance, ID, or null for global
+     * @param  string  $permissionSlug  Format: 'resource.action'
+     * @param  Scope|int|null  $scope  Scope instance, ID, or null for global
      */
     public function hasPermission(string $permissionSlug, Scope|int|null $scope = null): bool
     {
@@ -575,7 +576,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
                 'url' => '/shop',
                 'icon' => 'heroicon-o-building-storefront',
                 'color' => 'primary',
-                'entities' => $managedShops->map(fn($shop) => [
+                'entities' => $managedShops->map(fn ($shop) => [
                     'id' => $shop->id,
                     'name' => $shop->name,
                     'url' => "/shop/{$shop->slug}",
@@ -594,7 +595,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
                 'url' => '/kitchen',
                 'icon' => 'heroicon-o-fire',
                 'color' => 'warning',
-                'entities' => $managedKitchens->map(fn($kitchen) => [
+                'entities' => $managedKitchens->map(fn ($kitchen) => [
                     'id' => $kitchen->id,
                     'name' => $kitchen->name,
                     'url' => "/kitchen/{$kitchen->slug}",
@@ -613,7 +614,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
                 'url' => '/driver',
                 'icon' => 'heroicon-o-truck',
                 'color' => 'success',
-                'entities' => $managedDrivers->map(fn($driver) => [
+                'entities' => $managedDrivers->map(fn ($driver) => [
                     'id' => $driver->id,
                     'name' => $driver->name,
                     'url' => "/driver/{$driver->slug}",
@@ -632,7 +633,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
                 'url' => '/supplier',
                 'icon' => 'heroicon-o-cube',
                 'color' => 'info',
-                'entities' => $managedSuppliers->map(fn($supplier) => [
+                'entities' => $managedSuppliers->map(fn ($supplier) => [
                     'id' => $supplier->id,
                     'name' => $supplier->name,
                     'url' => "/supplier/{$supplier->slug}",
@@ -649,7 +650,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
                 'url' => '/supervisor',
                 'icon' => 'heroicon-o-eye',
                 'color' => 'purple',
-                'entities' => $managedSupervisors->map(fn($supervisor) => [
+                'entities' => $managedSupervisors->map(fn ($supervisor) => [
                     'id' => $supervisor->id,
                     'name' => $supervisor->name,
                     'url' => "/supervisor/{$supervisor->slug}",
@@ -670,6 +671,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     {
         if ($this->primary_template_id) {
             $template = $this->primaryTemplate;
+
             return $this->getPanelUrlForTemplate($template->slug);
         }
 

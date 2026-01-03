@@ -2,16 +2,16 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use App\Services\Permissions\PermissionChecker;
-use App\Services\Permissions\ScopeManager;
-use App\Services\Permissions\WildcardExpander;
 use App\Services\Permissions\ConditionEvaluator;
-use App\Services\Permissions\PermissionAuditLogger;
-use App\Services\Permissions\PermissionDelegator;
-use App\Services\Permissions\TemplateVersionManager;
 use App\Services\Permissions\PermissionAnalytics;
 use App\Services\Permissions\PermissionApprovalWorkflow;
+use App\Services\Permissions\PermissionAuditLogger;
+use App\Services\Permissions\PermissionChecker;
+use App\Services\Permissions\PermissionDelegator;
+use App\Services\Permissions\ScopeManager;
+use App\Services\Permissions\TemplateVersionManager;
+use App\Services\Permissions\WildcardExpander;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {

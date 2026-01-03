@@ -15,6 +15,7 @@ use Illuminate\Notifications\Notification;
  * Notify user that a permission has expired
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionExpiredNotification extends Notification implements ShouldQueue
@@ -46,13 +47,13 @@ class PermissionExpiredNotification extends Notification implements ShouldQueue
     {
         $message = (new MailMessage)
             ->subject('Permission Expired')
-            ->greeting('Hello ' . $notifiable->name . ',')
+            ->greeting('Hello '.$notifiable->name.',')
             ->line('Your permission has expired:')
-            ->line('**Permission:** ' . $this->permission->name)
-            ->line('**Slug:** ' . $this->permission->slug);
+            ->line('**Permission:** '.$this->permission->name)
+            ->line('**Slug:** '.$this->permission->slug);
 
         if ($this->scope) {
-            $message->line('**Scope:** ' . $this->scope->getDisplayName());
+            $message->line('**Scope:** '.$this->scope->getDisplayName());
         }
 
         $message->line('If you need to renew this permission, please contact your administrator.')
@@ -75,7 +76,7 @@ class PermissionExpiredNotification extends Notification implements ShouldQueue
             'permission_name' => $this->permission->name,
             'scope_id' => $this->scope?->id,
             'scope_name' => $this->scope?->getDisplayName(),
-            'message' => 'Your permission "' . $this->permission->name . '" has expired.',
+            'message' => 'Your permission "'.$this->permission->name.'" has expired.',
         ];
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
  * Handle UserGroup lifecycle events
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class UserGroupObserver
@@ -124,7 +125,7 @@ class UserGroupObserver
      */
     private function syncTemplateToUsers(UserGroup $userGroup): void
     {
-        if (!$userGroup->template_id) {
+        if (! $userGroup->template_id) {
             return;
         }
 

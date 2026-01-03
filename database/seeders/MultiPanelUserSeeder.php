@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\Driver;
+use App\Models\Kitchen;
 use App\Models\Role;
 use App\Models\Shop;
-use App\Models\Kitchen;
-use App\Models\Driver;
 use App\Models\Supervisor;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 

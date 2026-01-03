@@ -2,14 +2,14 @@
 
 namespace App\Services\Permissions;
 
-use App\Models\User;
+use App\Enums\AuditAction;
 use App\Models\Permission;
-use App\Models\Scope;
-use App\Models\PermissionTemplate;
+use App\Models\PermissionAuditLog;
 use App\Models\PermissionDelegation;
 use App\Models\PermissionRequest;
-use App\Models\PermissionAuditLog;
-use App\Enums\AuditAction;
+use App\Models\PermissionTemplate;
+use App\Models\Scope;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
  * Comprehensive audit logging for all permission changes
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionAuditLogger
@@ -25,14 +26,13 @@ class PermissionAuditLogger
     /**
      * Log permission grant
      *
-     * @param User $user User receiving permission
-     * @param Permission $permission Permission granted
-     * @param Scope|null $scope Scope context
-     * @param User $performedBy User granting permission
-     * @param string|null $reason Reason for grant
-     * @param string $source Source (direct, template, wildcard, inherited)
-     * @param int|null $sourceId Source ID (template_id, wildcard_id, etc.)
-     * @return PermissionAuditLog
+     * @param  User  $user  User receiving permission
+     * @param  Permission  $permission  Permission granted
+     * @param  Scope|null  $scope  Scope context
+     * @param  User  $performedBy  User granting permission
+     * @param  string|null  $reason  Reason for grant
+     * @param  string  $source  Source (direct, template, wildcard, inherited)
+     * @param  int|null  $sourceId  Source ID (template_id, wildcard_id, etc.)
      */
     public function logGrant(
         User $user,
@@ -68,11 +68,10 @@ class PermissionAuditLogger
     /**
      * Log permission revoke
      *
-     * @param User $user User losing permission
-     * @param Permission $permission Permission revoked
-     * @param User $performedBy User revoking permission
-     * @param string|null $reason Reason for revoke
-     * @return PermissionAuditLog
+     * @param  User  $user  User losing permission
+     * @param  Permission  $permission  Permission revoked
+     * @param  User  $performedBy  User revoking permission
+     * @param  string|null  $reason  Reason for revoke
      */
     public function logRevoke(
         User $user,
@@ -99,12 +98,11 @@ class PermissionAuditLogger
     /**
      * Log template assignment
      *
-     * @param User $user User receiving template
-     * @param PermissionTemplate $template Template assigned
-     * @param User $performedBy User assigning template
-     * @param Scope|null $scope Scope context
-     * @param string|null $reason Reason for assignment
-     * @return PermissionAuditLog
+     * @param  User  $user  User receiving template
+     * @param  PermissionTemplate  $template  Template assigned
+     * @param  User  $performedBy  User assigning template
+     * @param  Scope|null  $scope  Scope context
+     * @param  string|null  $reason  Reason for assignment
      */
     public function logTemplateAssignment(
         User $user,
@@ -118,7 +116,7 @@ class PermissionAuditLogger
             'user_name' => $user->name,
             'user_email' => $user->email,
             'action' => AuditAction::TEMPLATE_ASSIGNED->value,
-            'permission_slug' => 'template.' . $template->slug,
+            'permission_slug' => 'template.'.$template->slug,
             'permission_name' => $template->name,
             'source' => 'template',
             'source_id' => $template->id,
@@ -139,11 +137,10 @@ class PermissionAuditLogger
     /**
      * Log template removal
      *
-     * @param User $user User losing template
-     * @param PermissionTemplate $template Template removed
-     * @param User $performedBy User removing template
-     * @param string|null $reason Reason for removal
-     * @return PermissionAuditLog
+     * @param  User  $user  User losing template
+     * @param  PermissionTemplate  $template  Template removed
+     * @param  User  $performedBy  User removing template
+     * @param  string|null  $reason  Reason for removal
      */
     public function logTemplateRemoval(
         User $user,
@@ -156,7 +153,7 @@ class PermissionAuditLogger
             'user_name' => $user->name,
             'user_email' => $user->email,
             'action' => AuditAction::TEMPLATE_REMOVED->value,
-            'permission_slug' => 'template.' . $template->slug,
+            'permission_slug' => 'template.'.$template->slug,
             'permission_name' => $template->name,
             'source' => 'template',
             'source_id' => $template->id,
@@ -172,8 +169,7 @@ class PermissionAuditLogger
     /**
      * Log delegation creation
      *
-     * @param PermissionDelegation $delegation Delegation created
-     * @return PermissionAuditLog
+     * @param  PermissionDelegation  $delegation  Delegation created
      */
     public function logDelegation(PermissionDelegation $delegation): PermissionAuditLog
     {
@@ -186,7 +182,7 @@ class PermissionAuditLogger
             'permission_name' => null,
             'source' => 'delegation',
             'source_id' => $delegation->id,
-            'source_name' => 'Delegation from ' . $delegation->delegator_name,
+            'source_name' => 'Delegation from '.$delegation->delegator_name,
             'scope_id' => $delegation->scope_id,
             'performed_by' => $delegation->delegator_id,
             'performed_by_name' => $delegation->delegator_name,
@@ -203,13 +199,12 @@ class PermissionAuditLogger
     /**
      * Log permission request
      *
-     * @param PermissionRequest $request Request created/updated
-     * @param string $action Action (requested, approved, rejected)
-     * @return PermissionAuditLog
+     * @param  PermissionRequest  $request  Request created/updated
+     * @param  string  $action  Action (requested, approved, rejected)
      */
     public function logRequest(PermissionRequest $request, string $action): PermissionAuditLog
     {
-        $auditAction = match($action) {
+        $auditAction = match ($action) {
             'requested' => AuditAction::REQUESTED,
             'approved' => AuditAction::REQUEST_APPROVED,
             'rejected' => AuditAction::REQUEST_REJECTED,
@@ -240,9 +235,6 @@ class PermissionAuditLogger
 
     /**
      * Create audit log entry
-     *
-     * @param array $data
-     * @return PermissionAuditLog
      */
     private function createLog(array $data): PermissionAuditLog
     {
@@ -260,20 +252,16 @@ class PermissionAuditLogger
 
     /**
      * Get source name from source type and ID
-     *
-     * @param string $source
-     * @param int|null $sourceId
-     * @return string|null
      */
     private function getSourceName(string $source, ?int $sourceId): ?string
     {
-        if (!$sourceId) {
+        if (! $sourceId) {
             return null;
         }
 
-        return match($source) {
+        return match ($source) {
             'template' => PermissionTemplate::find($sourceId)?->name,
-            'wildcard' => 'Wildcard #' . $sourceId,
+            'wildcard' => 'Wildcard #'.$sourceId,
             default => null,
         };
     }

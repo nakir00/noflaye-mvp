@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\UserGroup;
-use App\Models\PermissionTemplate;
 use App\Models\PermissionGroup;
+use App\Models\PermissionTemplate;
+use App\Models\UserGroup;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
  * Rebuild all hierarchy closure tables
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class RebuildHierarchiesCommand extends Command

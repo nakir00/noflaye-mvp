@@ -11,6 +11,7 @@ use Filament\Widgets\ChartWidget;
  * Pie chart showing template usage distribution
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class TemplateAdoptionWidget extends ChartWidget

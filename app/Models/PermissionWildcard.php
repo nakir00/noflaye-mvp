@@ -3,18 +3,19 @@
 namespace App\Models;
 
 use App\Enums\WildcardPattern;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 
 /**
  * PermissionWildcard Model
- * 
+ *
  * Wildcard patterns for automatic permission expansion
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
+ *
  * @property int $id
  * @property string $pattern
  * @property string|null $description
@@ -31,6 +32,7 @@ use Illuminate\Support\Collection;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PermissionTemplate> $templates
  * @property-read int|null $templates_count
+ *
  * @method static Builder<static>|PermissionWildcard active()
  * @method static Builder<static>|PermissionWildcard autoExpand()
  * @method static Builder<static>|PermissionWildcard newModelQuery()
@@ -49,6 +51,7 @@ use Illuminate\Support\Collection;
  * @method static Builder<static>|PermissionWildcard wherePermissionsCount($value)
  * @method static Builder<static>|PermissionWildcard whereSortOrder($value)
  * @method static Builder<static>|PermissionWildcard whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class PermissionWildcard extends Model

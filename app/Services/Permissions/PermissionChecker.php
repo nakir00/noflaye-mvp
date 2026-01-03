@@ -2,10 +2,11 @@
 
 namespace App\Services\Permissions;
 
-use App\Models\User;
+use App\Enums\Permission as PermissionEnum;
 use App\Models\Permission;
-use App\Models\Scope;
 use App\Models\PermissionDelegation;
+use App\Models\Scope;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Cache;
  * Check user permissions with scope and condition support
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionChecker
@@ -27,13 +29,48 @@ class PermissionChecker
     ) {}
 
     /**
+     * Check if user has permission (accepts string or enum)
+     */
+    public function userHasPermission(
+        int $userId,
+        string|PermissionEnum $permission,
+        ?int $scopeId = null,
+        array $context = []
+    ): bool {
+        $permissionSlug = $permission instanceof PermissionEnum
+            ? $permission->value
+            : $permission;
+
+        return Cache::tags(['permissions', "user.{$userId}"])
+            ->remember(
+                "permission.{$userId}.{$permissionSlug}.{$scopeId}",
+                3600,
+                fn () => $this->checkPermission($userId, $permissionSlug, $scopeId, $context)
+            );
+    }
+
+    /**
+     * Check permission (internal method)
+     */
+    private function checkPermission(
+        int $userId,
+        string $permissionSlug,
+        ?int $scopeId,
+        array $context
+    ): bool {
+        // NOTE: load more relationships if needed from context
+        $user = User::find($userId);
+        if (! $user) {
+            return false;
+        }
+
+        $scope = $scopeId ? Scope::find($scopeId) : null;
+
+        return $this->checkWithScope($user, $permissionSlug, $scope);
+    }
+
+    /**
      * Check if user has permission with scope
-     *
-     * @param User $user
-     * @param string $permissionSlug
-     * @param Scope|int|null $scope
-     * @param Request|null $request
-     * @return bool
      */
     public function checkWithScope(
         User $user,
@@ -64,12 +101,6 @@ class PermissionChecker
 
     /**
      * Check if user has permission with conditions
-     *
-     * @param User $user
-     * @param string $permissionSlug
-     * @param array $conditions
-     * @param Request|null $request
-     * @return bool
      */
     public function checkWithConditions(
         User $user,
@@ -78,7 +109,7 @@ class PermissionChecker
         ?Request $request = null
     ): bool {
         // First check if user has permission at all
-        if (!$this->checkWithScope($user, $permissionSlug, null, $request)) {
+        if (! $this->checkWithScope($user, $permissionSlug, null, $request)) {
             return false;
         }
 
@@ -88,12 +119,6 @@ class PermissionChecker
 
     /**
      * Check if user has delegated permission
-     *
-     * @param User $user
-     * @param string $permissionSlug
-     * @param Scope|null $scope
-     * @param Request|null $request
-     * @return bool
      */
     public function hasDelegatedPermission(
         User $user,
@@ -104,7 +129,7 @@ class PermissionChecker
         $delegation = PermissionDelegation::active()
             ->where('delegatee_id', $user->id)
             ->where('permission_slug', $permissionSlug)
-            ->when($scope, fn($q) => $q->where('scope_id', $scope->id))
+            ->when($scope, fn ($q) => $q->where('scope_id', $scope->id))
             ->first();
 
         return $delegation !== null;
@@ -113,27 +138,25 @@ class PermissionChecker
     /**
      * Get all user permissions with scope
      *
-     * @param User $user
-     * @param Scope|null $scope
      * @return Collection<Permission>
      */
     public function getAllUserPermissions(User $user, ?Scope $scope = null): Collection
     {
-        $cacheKey = "user:{$user->id}:permissions:" . ($scope?->id ?? 'global');
+        $cacheKey = "user:{$user->id}:permissions:".($scope?->id ?? 'global');
 
         return Cache::remember($cacheKey, 600, function () use ($user, $scope) {
             $permissions = collect();
 
             // Direct permissions
             $directPerms = $user->permissions()
-                ->when($scope, fn($q) => $q->where('scope_id', $scope->id))
+                ->when($scope, fn ($q) => $q->where('scope_id', $scope->id))
                 ->get();
 
             $permissions = $permissions->merge($directPerms);
 
             // Template permissions
             $templates = $user->templates()
-                ->when($scope, fn($q) => $q->where('scope_id', $scope->id))
+                ->when($scope, fn ($q) => $q->where('scope_id', $scope->id))
                 ->with(['permissions', 'wildcards'])
                 ->get();
 
@@ -149,7 +172,7 @@ class PermissionChecker
             // Delegated permissions
             $delegations = PermissionDelegation::active()
                 ->where('delegatee_id', $user->id)
-                ->when($scope, fn($q) => $q->where('scope_id', $scope->id))
+                ->when($scope, fn ($q) => $q->where('scope_id', $scope->id))
                 ->with('permission')
                 ->get();
 
@@ -172,17 +195,17 @@ class PermissionChecker
     ): bool {
         $userPerm = $user->permissions()
             ->where('slug', $permissionSlug)
-            ->when($scope, fn($q) => $q->where('user_permissions.scope_id', $scope->id))
+            ->when($scope, fn ($q) => $q->where('user_permissions.scope_id', $scope->id))
             ->first();
 
-        if (!$userPerm) {
+        if (! $userPerm) {
             return false;
         }
 
         // Evaluate conditions if present
         $conditions = $userPerm->pivot->conditions ?? [];
 
-        if (!empty($conditions)) {
+        if (! empty($conditions)) {
             return $this->conditionEvaluator->evaluate($conditions, $user, $request);
         }
 
@@ -199,7 +222,7 @@ class PermissionChecker
         ?Request $request
     ): bool {
         $templates = $user->templates()
-            ->when($scope, fn($q) => $q->where('user_templates.scope_id', $scope->id))
+            ->when($scope, fn ($q) => $q->where('user_templates.scope_id', $scope->id))
             ->with(['permissions', 'wildcards'])
             ->get();
 

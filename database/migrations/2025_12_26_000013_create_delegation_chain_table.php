@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Schema;
  * Reason: Laravel convention uses plural table names, Model expects 'delegation_chains'
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.1
  */
 return new class extends Migration

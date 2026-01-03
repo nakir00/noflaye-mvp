@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
  * Handle User lifecycle events
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class UserObserver
@@ -24,7 +25,7 @@ class UserObserver
     public function created(User $user): void
     {
         // Auto-assign default template if not set
-        if (!$user->primary_template_id) {
+        if (! $user->primary_template_id) {
             $defaultTemplate = PermissionTemplate::where('slug', 'default')
                 ->where('is_active', true)
                 ->first();

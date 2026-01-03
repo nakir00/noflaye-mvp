@@ -11,6 +11,7 @@ use Illuminate\Console\Command;
  * Clean up old audit log entries
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class CleanupAuditLogCommand extends Command
@@ -46,6 +47,7 @@ class CleanupAuditLogCommand extends Command
 
         if ($count === 0) {
             $this->info('✅ No old audit logs found');
+
             return self::SUCCESS;
         }
 
@@ -59,7 +61,7 @@ class CleanupAuditLogCommand extends Command
 
             $this->table(
                 ['ID', 'User', 'Action', 'Permission', 'Created At'],
-                $sample->map(fn($log) => [
+                $sample->map(fn ($log) => [
                     $log->id,
                     $log->user_name,
                     $log->action,
@@ -69,11 +71,13 @@ class CleanupAuditLogCommand extends Command
             );
 
             $this->info("Total that would be deleted: {$count}");
+
             return self::SUCCESS;
         }
 
-        if (!$this->confirm("Delete {$count} audit log entries older than {$days} days?")) {
+        if (! $this->confirm("Delete {$count} audit log entries older than {$days} days?")) {
             $this->info('Cancelled');
+
             return self::SUCCESS;
         }
 

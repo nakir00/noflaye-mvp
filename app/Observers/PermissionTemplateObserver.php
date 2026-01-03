@@ -3,8 +3,8 @@
 namespace App\Observers;
 
 use App\Models\PermissionTemplate;
-use App\Services\Permissions\WildcardExpander;
 use App\Services\Permissions\PermissionChecker;
+use App\Services\Permissions\WildcardExpander;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
  * Handle PermissionTemplate lifecycle events
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionTemplateObserver
@@ -31,7 +32,7 @@ class PermissionTemplateObserver
     public function creating(PermissionTemplate $template): void
     {
         // Auto-generate slug if not provided
-        if (empty($template->slug) && !empty($template->name)) {
+        if (empty($template->slug) && ! empty($template->name)) {
             $template->slug = Str::slug($template->name);
         }
     }

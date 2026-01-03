@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Schema;
  * Features: Default template assignment
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 return new class extends Migration

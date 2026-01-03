@@ -11,6 +11,7 @@ use Filament\Resources\Pages\CreateRecord;
  * Create page for PermissionRequest resource
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class CreatePermissionRequest extends CreateRecord

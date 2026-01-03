@@ -11,6 +11,7 @@ use Illuminate\Console\Command;
  * Clean up expired permission delegations
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class ExpireDelegationsCommand extends Command
@@ -40,6 +41,7 @@ class ExpireDelegationsCommand extends Command
 
         if ($expiredCount === 0) {
             $this->info('✅ No expired delegations found');
+
             return self::SUCCESS;
         }
 

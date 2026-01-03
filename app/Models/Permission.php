@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Activitylog\LogsActivity;
 use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
 
 /**
@@ -27,6 +26,7 @@ use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
  * @property-read int|null $templates_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserGroup> $userGroups
  * @property-read int|null $user_groups_count
+ *
  * @method static \Database\Factories\PermissionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission newQuery()
@@ -42,12 +42,14 @@ use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission wherePermissionGroupId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Permission extends Model
 {
     /** @use HasFactory<\Database\Factories\PermissionFactory> */
     use HasFactory;
+
     use LogsActivityTrait;
 
     protected $fillable = [
@@ -221,7 +223,7 @@ class Permission extends Model
     /**
      * Scope query to only active permissions
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)
@@ -232,8 +234,7 @@ class Permission extends Model
     /**
      * Scope query by permission group
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int|null $groupId
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByGroup($query, ?int $groupId)
@@ -248,7 +249,7 @@ class Permission extends Model
     /**
      * Scope query to system permissions
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeSystem($query)
@@ -259,8 +260,7 @@ class Permission extends Model
     /**
      * Scope query to search permissions by name, slug, or description
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|null $search
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeSearch($query, ?string $search)
@@ -271,8 +271,8 @@ class Permission extends Model
 
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'like', "%{$search}%")
-              ->orWhere('slug', 'like', "%{$search}%")
-              ->orWhere('description', 'like', "%{$search}%");
+                ->orWhere('slug', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
         });
     }
 

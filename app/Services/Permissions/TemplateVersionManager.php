@@ -2,9 +2,9 @@
 
 namespace App\Services\Permissions;
 
-use App\Models\User;
 use App\Models\PermissionTemplate;
 use App\Models\PermissionTemplateVersion;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
  * Manage permission template versioning and publishing
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class TemplateVersionManager
@@ -21,11 +22,10 @@ class TemplateVersionManager
     /**
      * Create new version snapshot
      *
-     * @param PermissionTemplate $template Template to version
-     * @param User $user User creating version
-     * @param string|null $versionName Optional version name
-     * @param string|null $changelog Optional changelog
-     * @return PermissionTemplateVersion
+     * @param  PermissionTemplate  $template  Template to version
+     * @param  User  $user  User creating version
+     * @param  string|null  $versionName  Optional version name
+     * @param  string|null  $changelog  Optional changelog
      */
     public function createVersion(
         PermissionTemplate $template,
@@ -92,9 +92,8 @@ class TemplateVersionManager
     /**
      * Publish version
      *
-     * @param PermissionTemplateVersion $version Version to publish
-     * @param User $user User publishing version
-     * @return bool
+     * @param  PermissionTemplateVersion  $version  Version to publish
+     * @param  User  $user  User publishing version
      */
     public function publish(PermissionTemplateVersion $version, User $user): bool
     {
@@ -124,8 +123,7 @@ class TemplateVersionManager
     /**
      * Restore template to specific version
      *
-     * @param PermissionTemplateVersion $version Version to restore
-     * @return bool
+     * @param  PermissionTemplateVersion  $version  Version to restore
      */
     public function restore(PermissionTemplateVersion $version): bool
     {
@@ -170,8 +168,8 @@ class TemplateVersionManager
     /**
      * Compare two versions
      *
-     * @param PermissionTemplateVersion $v1 First version
-     * @param PermissionTemplateVersion $v2 Second version
+     * @param  PermissionTemplateVersion  $v1  First version
+     * @param  PermissionTemplateVersion  $v2  Second version
      * @return array Diff result
      */
     public function compareVersions(PermissionTemplateVersion $v1, PermissionTemplateVersion $v2): array
@@ -194,9 +192,8 @@ class TemplateVersionManager
     /**
      * Rollback template to previous version
      *
-     * @param PermissionTemplate $template Template to rollback
-     * @param int $steps Number of versions to go back
-     * @return PermissionTemplateVersion|null
+     * @param  PermissionTemplate  $template  Template to rollback
+     * @param  int  $steps  Number of versions to go back
      */
     public function rollback(PermissionTemplate $template, int $steps = 1): ?PermissionTemplateVersion
     {
@@ -204,7 +201,7 @@ class TemplateVersionManager
             ->latest('version')
             ->first();
 
-        if (!$currentVersion) {
+        if (! $currentVersion) {
             return null;
         }
 

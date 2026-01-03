@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property-read int|null $user_groups_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
+ *
  * @method static \Database\Factories\ShopFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Shop newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Shop newQuery()
@@ -44,6 +45,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Shop wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Shop whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Shop whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Shop extends Model implements HasName
@@ -213,8 +215,6 @@ class Shop extends Model implements HasName
 
     /**
      * Get managers of this shop
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function managers(): BelongsToMany
     {
@@ -225,8 +225,6 @@ class Shop extends Model implements HasName
 
     /**
      * Get all staff members of this shop
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function staff(): BelongsToMany
     {
@@ -238,7 +236,7 @@ class Shop extends Model implements HasName
     /**
      * Scope query to only active shops
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)

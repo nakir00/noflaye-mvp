@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property-read int|null $user_groups_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor query()
@@ -43,6 +44,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supervisor whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Supervisor extends Model implements HasName
@@ -212,8 +214,6 @@ class Supervisor extends Model implements HasName
 
     /**
      * Get managers of this supervisor
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function managers(): BelongsToMany
     {
@@ -224,8 +224,6 @@ class Supervisor extends Model implements HasName
 
     /**
      * Get all staff members of this supervisor
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function staff(): BelongsToMany
     {
@@ -237,7 +235,7 @@ class Supervisor extends Model implements HasName
     /**
      * Scope query to only active supervisors
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)

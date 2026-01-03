@@ -12,6 +12,7 @@ use UnitEnum;
  * Analytics dashboard for permission system
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionAnalyticsDashboard extends Page
@@ -57,7 +58,7 @@ class PermissionAnalyticsDashboard extends Page
     /**
      * Get the header widgets columns
      */
-    public function getHeaderWidgetsColumns(): int | array
+    public function getHeaderWidgetsColumns(): int|array
     {
         return 1;
     }
@@ -65,7 +66,7 @@ class PermissionAnalyticsDashboard extends Page
     /**
      * Get the widgets columns
      */
-    public function getWidgetsColumns(): int | array
+    public function getWidgetsColumns(): int|array
     {
         return [
             'md' => 2,

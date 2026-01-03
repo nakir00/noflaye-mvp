@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
  * Expire user permissions that have passed their expiration date
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class ExpirePermissionsCommand extends Command
@@ -45,6 +46,7 @@ class ExpirePermissionsCommand extends Command
 
         if ($expiredPermissions->isEmpty()) {
             $this->info('✅ No expired permissions found');
+
             return self::SUCCESS;
         }
 
@@ -55,7 +57,7 @@ class ExpirePermissionsCommand extends Command
 
             $this->table(
                 ['User ID', 'Permission ID', 'Expired At'],
-                $expiredPermissions->map(fn($p) => [
+                $expiredPermissions->map(fn ($p) => [
                     $p->user_id,
                     $p->permission_id,
                     $p->expires_at,

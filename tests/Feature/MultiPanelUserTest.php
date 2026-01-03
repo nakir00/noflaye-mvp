@@ -1,13 +1,13 @@
 <?php
 
-use App\Models\User;
-use App\Models\Shop;
-use App\Models\Kitchen;
-use App\Models\Driver;
-use App\Models\Supervisor;
-use App\Models\Role;
-use App\Models\Permission;
 use App\Models\DefaultPermissionTemplate;
+use App\Models\Driver;
+use App\Models\Kitchen;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\Shop;
+use App\Models\Supervisor;
+use App\Models\User;
 
 test('multi-panel user can access all their panels', function () {
     $user = User::factory()->create();

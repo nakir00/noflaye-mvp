@@ -15,6 +15,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
  * Stats overview for permission system
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionStatsWidget extends BaseWidget

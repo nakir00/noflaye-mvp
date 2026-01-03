@@ -4,7 +4,6 @@ namespace App\Filament\Widgets;
 
 use App\Models\UserPermission;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 /**
  * PermissionGrowthChart
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\DB;
  * Line chart showing permission assignments over time
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionGrowthChart extends ChartWidget

@@ -2,11 +2,11 @@
 
 namespace App\Services\Permissions;
 
-use App\Models\User;
-use App\Models\Permission;
-use App\Models\Scope;
-use App\Models\PermissionDelegation;
 use App\Models\DelegationChain;
+use App\Models\Permission;
+use App\Models\PermissionDelegation;
+use App\Models\Scope;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
  * Manage permission delegation with re-delegation support
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionDelegator
@@ -29,15 +30,15 @@ class PermissionDelegator
     /**
      * Delegate permission to another user
      *
-     * @param User $delegator User delegating permission
-     * @param User $delegatee User receiving delegation
-     * @param Permission $permission Permission to delegate
-     * @param Carbon $validUntil Delegation expiration
-     * @param Scope|null $scope Scope context
-     * @param bool $canRedelegate Allow re-delegation
-     * @param int $maxRedelegationDepth Maximum re-delegation depth
-     * @param string|null $reason Reason for delegation
-     * @return PermissionDelegation
+     * @param  User  $delegator  User delegating permission
+     * @param  User  $delegatee  User receiving delegation
+     * @param  Permission  $permission  Permission to delegate
+     * @param  Carbon  $validUntil  Delegation expiration
+     * @param  Scope|null  $scope  Scope context
+     * @param  bool  $canRedelegate  Allow re-delegation
+     * @param  int  $maxRedelegationDepth  Maximum re-delegation depth
+     * @param  string|null  $reason  Reason for delegation
+     *
      * @throws \Exception
      */
     public function delegate(
@@ -51,13 +52,13 @@ class PermissionDelegator
         ?string $reason = null
     ): PermissionDelegation {
         // Verify delegator has permission
-        if (!$this->canDelegate($delegator, $permission, $scope)) {
+        if (! $this->canDelegate($delegator, $permission, $scope)) {
             throw new \Exception("Delegator does not have permission to delegate: {$permission->slug}");
         }
 
         // Verify expiration is in future
         if ($validUntil->isPast()) {
-            throw new \Exception("Delegation expiration must be in the future");
+            throw new \Exception('Delegation expiration must be in the future');
         }
 
         return DB::transaction(function () use (
@@ -104,10 +105,9 @@ class PermissionDelegator
     /**
      * Revoke delegation
      *
-     * @param PermissionDelegation $delegation Delegation to revoke
-     * @param User $revokedBy User revoking delegation
-     * @param string|null $reason Reason for revocation
-     * @return bool
+     * @param  PermissionDelegation  $delegation  Delegation to revoke
+     * @param  User  $revokedBy  User revoking delegation
+     * @param  string|null  $reason  Reason for revocation
      */
     public function revoke(
         PermissionDelegation $delegation,
@@ -134,10 +134,9 @@ class PermissionDelegator
     /**
      * Check if user can delegate permission
      *
-     * @param User $user User attempting to delegate
-     * @param Permission $permission Permission to check
-     * @param Scope|null $scope Scope context
-     * @return bool
+     * @param  User  $user  User attempting to delegate
+     * @param  Permission  $permission  Permission to check
+     * @param  Scope|null  $scope  Scope context
      */
     public function canDelegate(User $user, Permission $permission, ?Scope $scope = null): bool
     {
@@ -148,7 +147,7 @@ class PermissionDelegator
     /**
      * Check re-delegation depth
      *
-     * @param PermissionDelegation $delegation Parent delegation
+     * @param  PermissionDelegation  $delegation  Parent delegation
      * @return int Current depth
      */
     public function checkRedelegationDepth(PermissionDelegation $delegation): int
@@ -162,23 +161,23 @@ class PermissionDelegator
     /**
      * Extend delegation expiration
      *
-     * @param PermissionDelegation $delegation Delegation to extend
-     * @param Carbon $newExpiration New expiration date
-     * @return bool
+     * @param  PermissionDelegation  $delegation  Delegation to extend
+     * @param  Carbon  $newExpiration  New expiration date
+     *
      * @throws \Exception
      */
     public function extendDelegation(PermissionDelegation $delegation, Carbon $newExpiration): bool
     {
         if ($delegation->revoked_at) {
-            throw new \Exception("Cannot extend revoked delegation");
+            throw new \Exception('Cannot extend revoked delegation');
         }
 
         if ($newExpiration->isPast()) {
-            throw new \Exception("New expiration must be in the future");
+            throw new \Exception('New expiration must be in the future');
         }
 
         if ($newExpiration->lessThan($delegation->valid_until)) {
-            throw new \Exception("New expiration must be later than current expiration");
+            throw new \Exception('New expiration must be later than current expiration');
         }
 
         $result = $delegation->update([
@@ -199,15 +198,14 @@ class PermissionDelegator
     /**
      * Get all active delegations for user
      *
-     * @param User $user User to check
-     * @param Scope|null $scope Scope filter
-     * @return \Illuminate\Support\Collection
+     * @param  User  $user  User to check
+     * @param  Scope|null  $scope  Scope filter
      */
     public function getUserDelegations(User $user, ?Scope $scope = null): \Illuminate\Support\Collection
     {
         return PermissionDelegation::active()
             ->where('delegatee_id', $user->id)
-            ->when($scope, fn($q) => $q->where('scope_id', $scope->id))
+            ->when($scope, fn ($q) => $q->where('scope_id', $scope->id))
             ->with(['permission', 'delegator', 'scope'])
             ->get();
     }

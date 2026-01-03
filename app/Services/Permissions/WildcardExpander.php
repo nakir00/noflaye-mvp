@@ -3,9 +3,8 @@
 namespace App\Services\Permissions;
 
 use App\Models\Permission;
-use App\Models\PermissionWildcard;
 use App\Models\PermissionTemplate;
-use App\Enums\WildcardPattern;
+use App\Models\PermissionWildcard;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +15,7 @@ use Illuminate\Support\Facades\Log;
  * Expands wildcard patterns into concrete permissions
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class WildcardExpander
@@ -23,7 +23,7 @@ class WildcardExpander
     /**
      * Expand a wildcard pattern into permissions
      *
-     * @param string $pattern Wildcard pattern (e.g., "shops.*", "*.read")
+     * @param  string  $pattern  Wildcard pattern (e.g., "shops.*", "*.read")
      * @return Collection<Permission>
      */
     public function expand(string $pattern): Collection
@@ -36,12 +36,14 @@ class WildcardExpander
         // Resource wildcard (shops.*)
         if (str_ends_with($pattern, '.*')) {
             $resource = str_replace('.*', '', $pattern);
+
             return Permission::where('slug', 'like', "{$resource}.%")->get();
         }
 
         // Action wildcard (*.read)
         if (str_starts_with($pattern, '*.')) {
             $action = str_replace('*.', '', $pattern);
+
             return Permission::where('slug', 'like', "%.{$action}")->get();
         }
 
@@ -52,7 +54,6 @@ class WildcardExpander
     /**
      * Expand wildcard for a template
      *
-     * @param PermissionTemplate $template
      * @return Collection<Permission>
      */
     public function expandForTemplate(PermissionTemplate $template): Collection
@@ -73,7 +74,6 @@ class WildcardExpander
     /**
      * Rebuild wildcard expansions (cache)
      *
-     * @param PermissionWildcard $wildcard
      * @return int Number of permissions expanded
      */
     public function rebuildExpansions(PermissionWildcard $wildcard): int
@@ -99,7 +99,7 @@ class WildcardExpander
             // Update count
             $wildcard->markAsExpanded($permissions->count());
 
-            Log::info("Wildcard expanded", [
+            Log::info('Wildcard expanded', [
                 'wildcard_id' => $wildcard->id,
                 'pattern' => $wildcard->pattern,
                 'permissions_count' => $permissions->count(),
@@ -111,10 +111,6 @@ class WildcardExpander
 
     /**
      * Check if permission matches pattern
-     *
-     * @param Permission $permission
-     * @param string $pattern
-     * @return bool
      */
     public function matchesPattern(Permission $permission, string $pattern): bool
     {
@@ -126,12 +122,14 @@ class WildcardExpander
         // Resource wildcard (shops.*)
         if (str_ends_with($pattern, '.*')) {
             $resource = str_replace('.*', '', $pattern);
+
             return str_starts_with($permission->slug, "{$resource}.");
         }
 
         // Action wildcard (*.read)
         if (str_starts_with($pattern, '*.')) {
             $action = str_replace('*.', '', $pattern);
+
             return str_ends_with($permission->slug, ".{$action}");
         }
 
@@ -142,7 +140,6 @@ class WildcardExpander
     /**
      * Get all permissions matching multiple patterns
      *
-     * @param array $patterns
      * @return Collection<Permission>
      */
     public function expandMultiple(array $patterns): Collection
@@ -173,7 +170,7 @@ class WildcardExpander
             $totalCount += $count;
         }
 
-        Log::info("Auto-expanded all wildcards", [
+        Log::info('Auto-expanded all wildcards', [
             'wildcards_count' => $wildcards->count(),
             'total_permissions' => $totalCount,
         ]);
@@ -184,19 +181,18 @@ class WildcardExpander
     /**
      * Expand macro pattern (custom logic)
      *
-     * @param string $pattern
      * @return Collection<Permission>
      */
     private function expandMacro(string $pattern): Collection
     {
         // Handle specific macro patterns
-        return match($pattern) {
+        return match ($pattern) {
             'shops.read' => Permission::whereIn('slug', [
-                'shops.list', 'shops.view', 'shops.read'
+                'shops.list', 'shops.view', 'shops.read',
             ])->get(),
 
             'shops.write' => Permission::whereIn('slug', [
-                'shops.create', 'shops.update', 'shops.delete'
+                'shops.create', 'shops.update', 'shops.delete',
             ])->get(),
 
             'shops.admin' => Permission::where('slug', 'like', 'shops.%')->get(),
@@ -208,10 +204,6 @@ class WildcardExpander
 
     /**
      * Check if permission matches macro pattern
-     *
-     * @param Permission $permission
-     * @param string $pattern
-     * @return bool
      */
     private function matchesMacro(Permission $permission, string $pattern): bool
     {

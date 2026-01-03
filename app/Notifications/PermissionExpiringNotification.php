@@ -16,6 +16,7 @@ use Illuminate\Notifications\Notification;
  * Notify user that a permission will expire soon
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionExpiringNotification extends Notification implements ShouldQueue
@@ -48,14 +49,14 @@ class PermissionExpiringNotification extends Notification implements ShouldQueue
 
         $message = (new MailMessage)
             ->subject('Permission Expiring Soon')
-            ->greeting('Hello ' . $notifiable->name . ',')
-            ->line('Your permission will expire in ' . $daysRemaining . ' day(s):')
-            ->line('**Permission:** ' . $this->permission->name)
-            ->line('**Slug:** ' . $this->permission->slug)
-            ->line('**Expires At:** ' . $this->expiresAt->format('Y-m-d H:i'));
+            ->greeting('Hello '.$notifiable->name.',')
+            ->line('Your permission will expire in '.$daysRemaining.' day(s):')
+            ->line('**Permission:** '.$this->permission->name)
+            ->line('**Slug:** '.$this->permission->slug)
+            ->line('**Expires At:** '.$this->expiresAt->format('Y-m-d H:i'));
 
         if ($this->scope) {
-            $message->line('**Scope:** ' . $this->scope->getDisplayName());
+            $message->line('**Scope:** '.$this->scope->getDisplayName());
         }
 
         $message->line('Please contact your administrator if you need to extend this permission.')
@@ -78,7 +79,7 @@ class PermissionExpiringNotification extends Notification implements ShouldQueue
             'days_remaining' => now()->diffInDays($this->expiresAt),
             'scope_id' => $this->scope?->id,
             'scope_name' => $this->scope?->getDisplayName(),
-            'message' => 'Your permission "' . $this->permission->name . '" expires in ' . now()->diffInDays($this->expiresAt) . ' day(s).',
+            'message' => 'Your permission "'.$this->permission->name.'" expires in '.now()->diffInDays($this->expiresAt).' day(s).',
         ];
     }
 }

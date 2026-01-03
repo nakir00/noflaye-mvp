@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
  * Handle PermissionGroup lifecycle events
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionGroupObserver

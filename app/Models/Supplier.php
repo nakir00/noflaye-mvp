@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property-read int|null $user_groups_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
+ *
  * @method static \Database\Factories\SupplierFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier newQuery()
@@ -38,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Supplier extends Model implements HasName
@@ -196,8 +198,6 @@ class Supplier extends Model implements HasName
 
     /**
      * Get managers of this supplier
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function managers(): BelongsToMany
     {
@@ -208,8 +208,6 @@ class Supplier extends Model implements HasName
 
     /**
      * Get all staff members of this supplier
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function staff(): BelongsToMany
     {
@@ -221,7 +219,7 @@ class Supplier extends Model implements HasName
     /**
      * Scope query to only active suppliers
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeActive($query)

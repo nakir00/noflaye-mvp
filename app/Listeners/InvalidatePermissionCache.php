@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
  * Invalidate permission cache when permissions change
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class InvalidatePermissionCache
@@ -26,11 +27,11 @@ class InvalidatePermissionCache
     /**
      * Handle the event
      *
-     * @param object $event Event with user property
+     * @param  object  $event  Event with user property
      */
     public function handle(object $event): void
     {
-        if (!isset($event->user) || !$event->user instanceof User) {
+        if (! isset($event->user) || ! $event->user instanceof User) {
             return;
         }
 

@@ -2,13 +2,13 @@
 
 namespace App\Services\Permissions;
 
-use App\Models\User;
 use App\Models\Permission;
-use App\Models\Scope;
 use App\Models\PermissionRequest;
+use App\Models\Scope;
+use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Collection;
 
 /**
  * PermissionApprovalWorkflow Service
@@ -16,6 +16,7 @@ use Illuminate\Support\Collection;
  * Manage permission request/approval workflow
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionApprovalWorkflow
@@ -27,12 +28,11 @@ class PermissionApprovalWorkflow
     /**
      * Create permission request
      *
-     * @param User $user User requesting permission
-     * @param Permission $permission Permission requested
-     * @param string $reason Reason for request
-     * @param Scope|null $scope Scope context
-     * @param array|null $metadata Additional metadata
-     * @return PermissionRequest
+     * @param  User  $user  User requesting permission
+     * @param  Permission  $permission  Permission requested
+     * @param  string  $reason  Reason for request
+     * @param  Scope|null  $scope  Scope context
+     * @param  array|null  $metadata  Additional metadata
      */
     public function createRequest(
         User $user,
@@ -68,10 +68,9 @@ class PermissionApprovalWorkflow
     /**
      * Approve permission request
      *
-     * @param PermissionRequest $request Request to approve
-     * @param User $reviewer User approving request
-     * @param string|null $comment Review comment
-     * @return bool
+     * @param  PermissionRequest  $request  Request to approve
+     * @param  User  $reviewer  User approving request
+     * @param  string|null  $comment  Review comment
      */
     public function approveRequest(
         PermissionRequest $request,
@@ -112,10 +111,9 @@ class PermissionApprovalWorkflow
     /**
      * Reject permission request
      *
-     * @param PermissionRequest $request Request to reject
-     * @param User $reviewer User rejecting request
-     * @param string|null $comment Rejection reason
-     * @return bool
+     * @param  PermissionRequest  $request  Request to reject
+     * @param  User  $reviewer  User rejecting request
+     * @param  string|null  $comment  Rejection reason
      */
     public function rejectRequest(
         PermissionRequest $request,
@@ -146,7 +144,7 @@ class PermissionApprovalWorkflow
     /**
      * Get pending requests for review
      *
-     * @param User|null $forReviewer Optional reviewer filter
+     * @param  User|null  $forReviewer  Optional reviewer filter
      * @return Collection<PermissionRequest>
      */
     public function getPendingRequests(?User $forReviewer = null): Collection
@@ -166,8 +164,8 @@ class PermissionApprovalWorkflow
     /**
      * Get user's request history
      *
-     * @param User $user User to check
-     * @param string|null $status Optional status filter
+     * @param  User  $user  User to check
+     * @param  string|null  $status  Optional status filter
      * @return Collection<PermissionRequest>
      */
     public function getUserRequestHistory(User $user, ?string $status = null): Collection
@@ -186,9 +184,9 @@ class PermissionApprovalWorkflow
     /**
      * Bulk approve requests
      *
-     * @param array $requestIds Request IDs to approve
-     * @param User $reviewer User approving requests
-     * @param string|null $comment Bulk comment
+     * @param  array  $requestIds  Request IDs to approve
+     * @param  User  $reviewer  User approving requests
+     * @param  string|null  $comment  Bulk comment
      * @return int Number of approved requests
      */
     public function bulkApproveRequests(array $requestIds, User $reviewer, ?string $comment = null): int
@@ -219,7 +217,7 @@ class PermissionApprovalWorkflow
     /**
      * Auto-expire old pending requests
      *
-     * @param int $daysOld Number of days to consider old
+     * @param  int  $daysOld  Number of days to consider old
      * @return int Number of expired requests
      */
     public function expireOldRequests(int $daysOld = 30): int
@@ -249,8 +247,6 @@ class PermissionApprovalWorkflow
 
     /**
      * Get request statistics
-     *
-     * @return array
      */
     public function getRequestStats(): array
     {

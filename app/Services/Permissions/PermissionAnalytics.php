@@ -2,15 +2,15 @@
 
 namespace App\Services\Permissions;
 
-use App\Models\User;
+use App\Enums\AuditAction;
 use App\Models\Permission;
-use App\Models\PermissionTemplate;
 use App\Models\PermissionAuditLog;
 use App\Models\PermissionDelegation;
-use App\Enums\AuditAction;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
+use App\Models\PermissionTemplate;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 /**
  * PermissionAnalytics Service
@@ -18,6 +18,7 @@ use Carbon\Carbon;
  * Analytics and statistics for permission system
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionAnalytics
@@ -25,9 +26,8 @@ class PermissionAnalytics
     /**
      * Get permission usage statistics
      *
-     * @param Carbon|null $startDate Start date for analysis
-     * @param Carbon|null $endDate End date for analysis
-     * @return array
+     * @param  Carbon|null  $startDate  Start date for analysis
+     * @param  Carbon|null  $endDate  End date for analysis
      */
     public function getPermissionUsageStats(?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
@@ -81,8 +81,7 @@ class PermissionAnalytics
     /**
      * Get user permission summary
      *
-     * @param User $user User to analyze
-     * @return array
+     * @param  User  $user  User to analyze
      */
     public function getUserPermissionSummary(User $user): array
     {
@@ -131,12 +130,10 @@ class PermissionAnalytics
 
     /**
      * Get template usage statistics
-     *
-     * @return array
      */
     public function getTemplateUsageStats(): array
     {
-        $cacheKey = "analytics:template_usage";
+        $cacheKey = 'analytics:template_usage';
 
         return Cache::remember($cacheKey, 3600, function () {
             // Most used templates
@@ -148,6 +145,7 @@ class PermissionAnalytics
                 ->get()
                 ->map(function ($item) {
                     $template = PermissionTemplate::find($item->template_id);
+
                     return [
                         'template_id' => $item->template_id,
                         'template_name' => $template?->name,
@@ -178,12 +176,10 @@ class PermissionAnalytics
 
     /**
      * Get delegation statistics
-     *
-     * @return array
      */
     public function getDelegationStats(): array
     {
-        $cacheKey = "analytics:delegation_stats";
+        $cacheKey = 'analytics:delegation_stats';
 
         return Cache::remember($cacheKey, 1800, function () {
             $activeDelegations = PermissionDelegation::active()->count();
@@ -215,8 +211,7 @@ class PermissionAnalytics
     /**
      * Get audit activity timeline
      *
-     * @param int $days Number of days to analyze
-     * @return array
+     * @param  int  $days  Number of days to analyze
      */
     public function getAuditTimeline(int $days = 30): array
     {
@@ -237,6 +232,7 @@ class PermissionAnalytics
                 ->groupBy('date')
                 ->map(function ($dayLogs, $date) {
                     $actions = $dayLogs->pluck('count', 'action')->toArray();
+
                     return [
                         'date' => $date,
                         'granted' => $actions[AuditAction::GRANTED->value] ?? 0,
@@ -255,12 +251,10 @@ class PermissionAnalytics
 
     /**
      * Get system health metrics
-     *
-     * @return array
      */
     public function getSystemHealthMetrics(): array
     {
-        $cacheKey = "analytics:system_health";
+        $cacheKey = 'analytics:system_health';
 
         return Cache::remember($cacheKey, 600, function () {
             // Users with excessive permissions (>100)
@@ -293,8 +287,6 @@ class PermissionAnalytics
 
     /**
      * Invalidate all analytics caches
-     *
-     * @return void
      */
     public function invalidateAllCaches(): void
     {

@@ -8,6 +8,7 @@ namespace App\Enums;
  * Purpose: Define auditable actions for permission_audit_log table
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 enum AuditAction: string
@@ -99,7 +100,7 @@ enum AuditAction: string
      */
     public function description(): string
     {
-        return match($this) {
+        return match ($this) {
             self::GRANTED => 'Permission granted to user',
             self::REVOKED => 'Permission revoked from user',
             self::EXPIRED => 'Permission expired automatically',
@@ -127,7 +128,7 @@ enum AuditAction: string
      */
     public function icon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::GRANTED => 'heroicon-o-check-circle',
             self::REVOKED => 'heroicon-o-x-circle',
             self::EXPIRED => 'heroicon-o-clock',
@@ -155,7 +156,7 @@ enum AuditAction: string
      */
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::GRANTED, self::TEMPLATE_ASSIGNED, self::REQUEST_APPROVED => 'success',
             self::REVOKED, self::TEMPLATE_REMOVED, self::DELEGATION_REVOKED, self::REQUEST_REJECTED => 'danger',
             self::EXPIRED, self::DELEGATION_EXPIRED => 'warning',

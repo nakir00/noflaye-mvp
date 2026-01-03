@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Schema;
  * Tables: wildcard_permissions, template_wildcards
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 return new class extends Migration

@@ -10,10 +10,7 @@ class ContextRuleEvaluator
     /**
      * Évalue les règles contextuelles pour une permission
      *
-     * @param User $user
-     * @param Permission $permission
-     * @param array $context Contexte additionnel (montant, heure, etc.)
-     * @return bool
+     * @param  array  $context  Contexte additionnel (montant, heure, etc.)
      */
     public function evaluate(User $user, Permission $permission, array $context = []): bool
     {

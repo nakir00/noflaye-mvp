@@ -8,6 +8,7 @@ namespace App\Enums;
  * Purpose: Predefined wildcard patterns for automatic permission expansion
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 enum WildcardPattern: string
@@ -93,12 +94,12 @@ enum WildcardPattern: string
     /**
      * Get patterns by resource type
      *
-     * @param string $resource Resource name (shops, users, products, etc.)
+     * @param  string  $resource  Resource name (shops, users, products, etc.)
      * @return array<WildcardPattern>
      */
     public static function forResource(string $resource): array
     {
-        return match($resource) {
+        return match ($resource) {
             'shops' => self::shopPatterns(),
             'users' => self::userPatterns(),
             'products' => [self::PRODUCTS_ALL, self::PRODUCTS_READ, self::PRODUCTS_WRITE],
@@ -113,7 +114,7 @@ enum WildcardPattern: string
      */
     public function description(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ALL => 'All permissions on all resources',
             self::ALL_READ => 'Read permissions on all resources',
             self::ALL_WRITE => 'Write permissions (create, update, delete) on all resources',
@@ -148,7 +149,7 @@ enum WildcardPattern: string
      */
     public function icon(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ALL, self::ALL_READ, self::ALL_WRITE, self::ALL_ADMIN => 'heroicon-o-globe-alt',
 
             self::SHOPS_ALL, self::SHOPS_READ, self::SHOPS_WRITE, self::SHOPS_ADMIN => 'heroicon-o-building-storefront',
@@ -168,7 +169,7 @@ enum WildcardPattern: string
      */
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ALL, self::ALL_ADMIN => 'danger',
             self::ALL_READ => 'info',
             self::ALL_WRITE => 'warning',

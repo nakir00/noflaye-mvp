@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
  * View user delegations received (readonly)
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class DelegationsRelationManager extends RelationManager
@@ -67,6 +68,7 @@ class DelegationsRelationManager extends RelationManager
                         if ($record->valid_until < now()) {
                             return 'expired';
                         }
+
                         return 'active';
                     })
                     ->color(fn (string $state): string => match ($state) {

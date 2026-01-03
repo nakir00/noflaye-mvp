@@ -3,7 +3,6 @@
 namespace App\Filament\Pages;
 
 use App\Models\PermissionDelegation;
-use App\Services\Permissions\PermissionDelegator;
 use BackedEnum;
 use Filament\Actions\ViewAction;
 use Filament\Pages\Page;
@@ -22,6 +21,7 @@ use UnitEnum;
  * User's delegations (received and given)
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class MyDelegations extends Page implements HasTable
@@ -71,6 +71,7 @@ class MyDelegations extends Page implements HasTable
                         if ($record->valid_until < now()) {
                             return 'expired';
                         }
+
                         return 'active';
                     })
                     ->color(fn (string $state): string => match ($state) {

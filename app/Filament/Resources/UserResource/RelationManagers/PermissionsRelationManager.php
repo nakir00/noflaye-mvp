@@ -21,6 +21,7 @@ use Filament\Tables\Table;
  * Manage user permissions
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionsRelationManager extends RelationManager
@@ -113,7 +114,7 @@ class PermissionsRelationManager extends RelationManager
                 Tables\Columns\IconColumn::make('pivot.conditions')
                     ->label('Has Conditions')
                     ->boolean()
-                    ->getStateUsing(fn ($record) => !empty($record->pivot->conditions)),
+                    ->getStateUsing(fn ($record) => ! empty($record->pivot->conditions)),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('source')

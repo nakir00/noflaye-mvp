@@ -2,8 +2,8 @@
 
 namespace App\Observers;
 
-use App\Models\User;
 use App\Models\Permission;
+use App\Models\User;
 use App\Services\Permissions\PermissionAuditLogger;
 use App\Services\Permissions\PermissionChecker;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
  * Handle user-permission pivot events (attach/detach)
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class UserPermissionObserver
@@ -26,16 +27,12 @@ class UserPermissionObserver
 
     /**
      * Handle user permission attached event
-     *
-     * @param User $user
-     * @param int $permissionId
-     * @param array $pivotData
      */
     public function attached(User $user, int $permissionId, array $pivotData): void
     {
         $permission = Permission::find($permissionId);
 
-        if (!$permission) {
+        if (! $permission) {
             return;
         }
 
@@ -66,15 +63,12 @@ class UserPermissionObserver
 
     /**
      * Handle user permission detached event
-     *
-     * @param User $user
-     * @param int $permissionId
      */
     public function detached(User $user, int $permissionId): void
     {
         $permission = Permission::find($permissionId);
 
-        if (!$permission) {
+        if (! $permission) {
             return;
         }
 
@@ -97,9 +91,6 @@ class UserPermissionObserver
 
     /**
      * Handle user permission synced event
-     *
-     * @param User $user
-     * @param array $changes
      */
     public function synced(User $user, array $changes): void
     {

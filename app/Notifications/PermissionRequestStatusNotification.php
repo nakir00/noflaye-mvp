@@ -14,6 +14,7 @@ use Illuminate\Notifications\Notification;
  * Notify user about permission request status change
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionRequestStatusNotification extends Notification implements ShouldQueue
@@ -41,7 +42,7 @@ class PermissionRequestStatusNotification extends Notification implements Should
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $subject = match($this->status) {
+        $subject = match ($this->status) {
             'approved' => 'Permission Request Approved',
             'rejected' => 'Permission Request Rejected',
             default => 'Permission Request Updated',
@@ -49,41 +50,41 @@ class PermissionRequestStatusNotification extends Notification implements Should
 
         $message = (new MailMessage)
             ->subject($subject)
-            ->greeting('Hello ' . $notifiable->name . ',');
+            ->greeting('Hello '.$notifiable->name.',');
 
         if ($this->status === 'approved') {
             $message->line('Good news! Your permission request has been approved.')
-                ->line('**Permission:** ' . $this->request->permission->name)
-                ->line('**Reviewed By:** ' . $this->request->reviewer->name)
-                ->line('**Reviewed At:** ' . $this->request->reviewed_at->format('Y-m-d H:i'));
+                ->line('**Permission:** '.$this->request->permission->name)
+                ->line('**Reviewed By:** '.$this->request->reviewer->name)
+                ->line('**Reviewed At:** '.$this->request->reviewed_at->format('Y-m-d H:i'));
 
             if ($this->request->scope) {
-                $message->line('**Scope:** ' . $this->request->scope->getDisplayName());
+                $message->line('**Scope:** '.$this->request->scope->getDisplayName());
             }
 
             if ($this->request->review_comment) {
-                $message->line('**Comment:** ' . $this->request->review_comment);
+                $message->line('**Comment:** '.$this->request->review_comment);
             }
 
             $message->line('You can now use this permission.')
                 ->action('View My Permissions', url('/my-permissions'));
         } elseif ($this->status === 'rejected') {
             $message->line('Your permission request has been rejected.')
-                ->line('**Permission:** ' . $this->request->permission->name)
-                ->line('**Reviewed By:** ' . $this->request->reviewer->name)
-                ->line('**Reviewed At:** ' . $this->request->reviewed_at->format('Y-m-d H:i'));
+                ->line('**Permission:** '.$this->request->permission->name)
+                ->line('**Reviewed By:** '.$this->request->reviewer->name)
+                ->line('**Reviewed At:** '.$this->request->reviewed_at->format('Y-m-d H:i'));
 
             if ($this->request->review_comment) {
-                $message->line('**Reason:** ' . $this->request->review_comment);
+                $message->line('**Reason:** '.$this->request->review_comment);
             }
 
             $message->line('You can submit a new request if needed.')
                 ->action('Submit New Request', url('/permission-requests/create'));
         } else {
             $message->line('Your permission request status has been updated.')
-                ->line('**Permission:** ' . $this->request->permission->name)
-                ->line('**Status:** ' . ucfirst($this->status))
-                ->action('View Request', url('/permission-requests/' . $this->request->id));
+                ->line('**Permission:** '.$this->request->permission->name)
+                ->line('**Status:** '.ucfirst($this->status))
+                ->action('View Request', url('/permission-requests/'.$this->request->id));
         }
 
         $message->line('Thank you!');
@@ -108,7 +109,7 @@ class PermissionRequestStatusNotification extends Notification implements Should
             'review_comment' => $this->request->review_comment,
             'scope_id' => $this->request->scope_id,
             'scope_name' => $this->request->scope?->getDisplayName(),
-            'message' => 'Your permission request for "' . $this->request->permission->name . '" has been ' . $this->status . '.',
+            'message' => 'Your permission request for "'.$this->request->permission->name.'" has been '.$this->status.'.',
         ];
     }
 }

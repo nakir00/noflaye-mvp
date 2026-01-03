@@ -14,6 +14,7 @@ use Illuminate\Notifications\Notification;
  * Notify user that a permission has been delegated to them
  *
  * @author Noflaye Box Team
+ *
  * @version 1.0.0
  */
 class PermissionDelegatedNotification extends Notification implements ShouldQueue
@@ -42,18 +43,18 @@ class PermissionDelegatedNotification extends Notification implements ShouldQueu
     {
         $message = (new MailMessage)
             ->subject('Permission Delegated to You')
-            ->greeting('Hello ' . $notifiable->name . ',')
+            ->greeting('Hello '.$notifiable->name.',')
             ->line('A permission has been delegated to you:')
-            ->line('**Permission:** ' . $this->delegation->permission_slug)
-            ->line('**Delegated By:** ' . $this->delegation->delegator_name)
-            ->line('**Valid Until:** ' . $this->delegation->valid_until->format('Y-m-d H:i'));
+            ->line('**Permission:** '.$this->delegation->permission_slug)
+            ->line('**Delegated By:** '.$this->delegation->delegator_name)
+            ->line('**Valid Until:** '.$this->delegation->valid_until->format('Y-m-d H:i'));
 
         if ($this->delegation->scope) {
-            $message->line('**Scope:** ' . $this->delegation->scope->getDisplayName());
+            $message->line('**Scope:** '.$this->delegation->scope->getDisplayName());
         }
 
         if ($this->delegation->reason) {
-            $message->line('**Reason:** ' . $this->delegation->reason);
+            $message->line('**Reason:** '.$this->delegation->reason);
         }
 
         if ($this->delegation->can_redelegate) {
@@ -83,7 +84,7 @@ class PermissionDelegatedNotification extends Notification implements ShouldQueu
             'reason' => $this->delegation->reason,
             'scope_id' => $this->delegation->scope_id,
             'scope_name' => $this->delegation->scope?->getDisplayName(),
-            'message' => $this->delegation->delegator_name . ' delegated "' . $this->delegation->permission_slug . '" to you until ' . $this->delegation->valid_until->format('Y-m-d'),
+            'message' => $this->delegation->delegator_name.' delegated "'.$this->delegation->permission_slug.'" to you until '.$this->delegation->valid_until->format('Y-m-d'),
         ];
     }
 }
