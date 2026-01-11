@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\DriverResource\Pages;
+namespace App\Filament\Driver\Clusters\Profile\Resources\Drivers\Pages;
 
-use App\Filament\Resources\DriverResource;
+use App\Filament\Driver\Clusters\Profile\Resources\Drivers\DriverResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -14,7 +14,6 @@ class ViewDriver extends ViewRecord
     {
         return [
             Actions\EditAction::make(),
-            Actions\DeleteAction::make(),
         ];
     }
 }

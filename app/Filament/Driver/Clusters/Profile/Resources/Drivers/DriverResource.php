@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Driver\Clusters\Profile\Resources\Drivers;
 
-use App\Filament\Resources\DriverResource\Pages;
+use App\Filament\Driver\Clusters\Profile\ProfileCluster;
+use App\Filament\Driver\Clusters\Profile\Resources\Drivers\Pages;
 use App\Models\Driver;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -26,11 +27,13 @@ class DriverResource extends Resource
 {
     protected static ?string $model = Driver::class;
 
+    protected static ?string $cluster = ProfileCluster::class;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-truck';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Entities Management';
+    protected static string|UnitEnum|null $navigationGroup = null;
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $form): Schema
     {
@@ -109,10 +112,8 @@ class DriverResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // UsersRelationManager::class, // TODO: Create this RelationManager
-            // ShopsRelationManager::class, // TODO: Create this RelationManager
-            // KitchensRelationManager::class, // TODO: Create this RelationManager
-            // UserGroupsRelationManager::class, // TODO: Create this RelationManager
+            // ShopsRelationManager::class,
+            // KitchensRelationManager::class,
         ];
     }
 

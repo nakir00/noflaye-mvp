@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\KitchenResource\Pages;
+namespace App\Filament\Kitchen\Clusters\Operations\Resources\Kitchens\Pages;
 
-use App\Filament\Resources\KitchenResource;
+use App\Filament\Kitchen\Clusters\Operations\Resources\Kitchens\KitchenResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 

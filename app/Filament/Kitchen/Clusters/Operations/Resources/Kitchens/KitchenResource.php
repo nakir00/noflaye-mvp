@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Kitchen\Clusters\Operations\Resources\Kitchens;
 
-use App\Filament\Resources\SupervisorResource\Pages;
-use App\Filament\Resources\SupervisorResource\RelationManagers;
-use App\Models\Supervisor;
+use App\Filament\Kitchen\Clusters\Operations\OperationsCluster;
+use App\Filament\Kitchen\Clusters\Operations\Resources\Kitchens\Pages;
+use App\Models\Kitchen;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -19,21 +19,23 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
 
-class SupervisorResource extends Resource
+class KitchenResource extends Resource
 {
-    protected static ?string $model = Supervisor::class;
+    protected static ?string $model = Kitchen::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-eye';
+    protected static ?string $cluster = OperationsCluster::class;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Entities Management';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-fire';
 
-    protected static ?int $navigationSort = 5;
+    protected static string|UnitEnum|null $navigationGroup = null;
+
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $form): Schema
     {
         return $form
             ->components([
-                Section::make('Supervisor Information')
+                Section::make('Kitchen Information')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
@@ -50,6 +52,9 @@ class SupervisorResource extends Resource
                             ->email(),
                         Forms\Components\Textarea::make('address')
                             ->rows(3),
+                        Forms\Components\TextInput::make('capacity')
+                            ->numeric()
+                            ->minValue(0),
                         Forms\Components\Toggle::make('is_active')
                             ->default(true),
                     ])
@@ -68,17 +73,14 @@ class SupervisorResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('capacity')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('users_count')
                     ->counts('users')
                     ->label('Managers'),
                 Tables\Columns\TextColumn::make('shops_count')
                     ->counts('shops')
-                    ->label('Shops'),
-                Tables\Columns\TextColumn::make('kitchens_count')
-                    ->counts('kitchens')
-                    ->label('Kitchens'),
+                    ->label('Linked Shops'),
                 Tables\Columns\TextColumn::make('drivers_count')
                     ->counts('drivers')
                     ->label('Drivers'),
@@ -103,21 +105,19 @@ class SupervisorResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // RelationManagers\UsersRelationManager::class, // TODO: Create this RelationManager
-            // RelationManagers::ShopsRelationManager::class, // TODO: Create this RelationManager
-            // RelationManagers::KitchensRelationManager::class, // TODO: Create this RelationManager
-            // RelationManagers::DriversRelationManager::class, // TODO: Create this RelationManager
-            // RelationManagers::UserGroupsRelationManager::class, // TODO: Create this RelationManager
+            // UsersRelationManager::class,
+            // ShopsRelationManager::class,
+            // DriversRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSupervisors::route('/'),
-            'create' => Pages\CreateSupervisor::route('/create'),
-            'view' => Pages\ViewSupervisor::route('/{record}'),
-            'edit' => Pages\EditSupervisor::route('/{record}/edit'),
+            'index' => Pages\ListKitchens::route('/'),
+            'create' => Pages\CreateKitchen::route('/create'),
+            'view' => Pages\ViewKitchen::route('/{record}'),
+            'edit' => Pages\EditKitchen::route('/{record}/edit'),
         ];
     }
 }
