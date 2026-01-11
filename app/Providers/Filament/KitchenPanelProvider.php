@@ -32,6 +32,10 @@ class KitchenPanelProvider extends PanelProvider
                 'primary' => Color::Orange,
             ])
             ->discoverResources(in: app_path('Filament/Kitchen/Resources'), for: 'App\\Filament\\Kitchen\\Resources')
+
+            // Découverte des clusters
+            ->discoverClusters(in: app_path('Filament/Kitchen/Clusters'), for: 'App\\Filament\\Kitchen\\Clusters')
+
             ->discoverPages(in: app_path('Filament/Kitchen/Pages'), for: 'App\\Filament\\Kitchen\\Pages')
             ->pages([
                 Pages\Dashboard::class,

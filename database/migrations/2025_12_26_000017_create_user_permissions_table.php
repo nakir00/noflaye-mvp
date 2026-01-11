@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('permission_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
 
+            $table->dateTime('expires_at')->nullable()->comment('Permission expiration datetime');
+
             // Unique constraint to prevent duplicate assignments
             $table->unique(['user_id', 'permission_id'], 'unique_user_permission');
 

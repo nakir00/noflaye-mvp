@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\Auth\AdminRegister;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -24,14 +23,19 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->default()
             ->id('admin')
             ->path('admin')
             ->login()
-            ->registration(AdminRegister::class)
             ->colors([
                 'primary' => Color::Red,
             ])
+            // Découverte des ressources dans l'ancien emplacement (temporaire)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+
+            // Découverte des clusters dans le panel Admin
+            ->discoverClusters(in: app_path('Filament/Admin/Clusters'), for: 'App\\Filament\\Admin\\Clusters')
+
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,

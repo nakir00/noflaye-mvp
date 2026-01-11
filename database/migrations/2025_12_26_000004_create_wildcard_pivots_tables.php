@@ -44,17 +44,17 @@ return new class extends Migration
         Schema::create('template_wildcards', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('template_id')->comment('Permission template ID');
-            $table->foreign('template_id')->references('id')->on('permission_templates')->onDelete('cascade');
+            $table->unsignedBigInteger('permission_template_id')->comment('Permission template ID');
+            $table->foreign('permission_template_id')->references('id')->on('permission_templates')->onDelete('cascade');
 
-            $table->unsignedBigInteger('wildcard_id')->comment('Wildcard pattern ID');
-            $table->foreign('wildcard_id')->references('id')->on('permission_wildcards')->onDelete('cascade');
+            $table->unsignedBigInteger('permission_wildcard_id')->comment('Wildcard pattern ID');
+            $table->foreign('permission_wildcard_id')->references('id')->on('permission_wildcards')->onDelete('cascade');
 
             $table->integer('sort_order')->default(0)->comment('Display order in template');
             $table->timestamps();
 
             // Unique constraint
-            $table->unique(['template_id', 'wildcard_id'], 'unique_template_wildcard');
+            $table->unique(['permission_template_id', 'wildcard_id'], 'unique_template_wildcard');
         });
     }
 

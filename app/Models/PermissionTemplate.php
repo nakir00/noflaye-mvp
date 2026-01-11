@@ -143,7 +143,7 @@ class PermissionTemplate extends Model
 
     public function permissions(): BelongsToMany
     {
-        return $this->belongsToMany(Permission::class, 'template_permissions', 'template_id', 'permission_id')
+        return $this->belongsToMany(Permission::class, 'template_permissions', 'permission_template_id', 'permission_id')
             ->withPivot('source', 'wildcard_id', 'sort_order')
             ->withTimestamps();
     }
@@ -164,7 +164,7 @@ class PermissionTemplate extends Model
 
     public function versions(): HasMany
     {
-        return $this->hasMany(PermissionTemplateVersion::class, 'template_id');
+        return $this->hasMany(PermissionTemplateVersion::class, 'permission_template_id');
     }
 
     public function scope(): BelongsTo

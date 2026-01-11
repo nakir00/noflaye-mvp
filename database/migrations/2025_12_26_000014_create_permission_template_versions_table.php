@@ -24,8 +24,8 @@ return new class extends Migration
         Schema::create('permission_template_versions', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('template_id')->comment('Permission template ID');
-            $table->foreign('template_id')->references('id')->on('permission_templates')->onDelete('cascade');
+            $table->unsignedBigInteger('permission_template_id')->comment('Permission template ID');
+            $table->foreign('permission_template_id')->references('id')->on('permission_templates')->onDelete('cascade');
 
             $table->integer('version')->comment('Version number');
 
@@ -59,11 +59,10 @@ return new class extends Migration
             $table->foreign('published_by')->references('id')->on('users')->onDelete('set null');
 
             // Unique constraint and indexes
-            $table->unique(['template_id', 'version'], 'unique_template_version');
+            $table->unique(['permission_template_id', 'version'], 'unique_template_version');
             $table->index(['is_published', 'is_stable'], 'idx_published_stable');
         });
     }
-
     /**
      * Reverse the migrations.
      */

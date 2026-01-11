@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @version 1.0.0
  *
  * @property int $id
- * @property int $template_id
+ * @property int $permission_template_id
  * @property int $version
  * @property string $name
  * @property string $slug
@@ -75,7 +75,7 @@ class PermissionTemplateVersion extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'template_id',
+        'permission_template_id',
         'version',
         'name',
         'slug',

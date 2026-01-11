@@ -4,7 +4,7 @@ namespace App\Observers;
 
 use App\Models\Permission;
 use App\Services\Permissions\WildcardExpander;
-use Illuminate\Support\Facades\Cache;
+use App\Support\TaggableCache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -118,6 +118,6 @@ class PermissionObserver
      */
     private function clearPermissionCache(): void
     {
-        Cache::tags(['permissions'])->flush();
+        TaggableCache::flushTags(['permissions']);
     }
 }

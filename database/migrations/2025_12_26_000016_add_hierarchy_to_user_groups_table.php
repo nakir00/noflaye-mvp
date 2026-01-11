@@ -29,15 +29,15 @@ return new class extends Migration
             $table->integer('level')->default(0)->after('parent_id')->comment('Hierarchy level (0=root)');
 
             // Template association
-            $table->unsignedBigInteger('template_id')->nullable()->after('level')->comment('Associated permission template');
-            $table->foreign('template_id')->references('id')->on('permission_templates')
+            $table->unsignedBigInteger('permission_template_id')->nullable()->after('level')->comment('Associated permission template');
+            $table->foreign('permission_template_id')->references('id')->on('permission_templates')
                 ->onDelete('set null')->onUpdate('cascade');
-            $table->boolean('auto_sync_template')->default(false)->after('template_id')
+            $table->boolean('auto_sync_template')->default(false)->after('permission_template_id')
                 ->comment('Auto-sync permissions from template');
 
             // Performance indexes
             $table->index('parent_id');
-            $table->index('template_id');
+            $table->index('permission_template_id');
             $table->index(['level', 'parent_id'], 'idx_user_groups_hierarchy');
         });
     }
@@ -49,11 +49,11 @@ return new class extends Migration
     {
         Schema::table('user_groups', function (Blueprint $table) {
             $table->dropForeign(['parent_id']);
-            $table->dropForeign(['template_id']);
-            $table->dropIndex('idx__user_groups_hierarchy');
+            $table->dropForeign(['permission_template_id']);
+            $table->dropIndex('idx_user_groups_hierarchy');
             $table->dropIndex(['parent_id']);
-            $table->dropIndex(['template_id']);
-            $table->dropColumn(['parent_id', 'level', 'template_id', 'auto_sync_template']);
+            $table->dropIndex(['permission_template_id']);
+            $table->dropColumn(['parent_id', 'level', 'permission_template_id', 'auto_sync_template']);
         });
     }
 };

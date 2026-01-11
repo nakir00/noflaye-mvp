@@ -24,8 +24,8 @@ return new class extends Migration
         Schema::create('template_permissions', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('template_id')->comment('Permission template ID');
-            $table->foreign('template_id')->references('id')->on('permission_templates')->onDelete('cascade');
+            $table->unsignedBigInteger('permission_template_id')->comment('Permission template ID');
+            $table->foreign('permission_template_id')->references('id')->on('permission_templates')->onDelete('cascade');
 
             $table->unsignedBigInteger('permission_id')->comment('Permission ID');
             $table->foreign('permission_id')->references('id')->on('permissions')->onDelete('cascade');
@@ -42,7 +42,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Unique constraint and indexes
-            $table->unique(['template_id', 'permission_id'], 'unique_template_permission');
+            $table->unique(['permission_template_id', 'permission_id'], 'unique_template_permission');
             $table->index(['source', 'wildcard_id'], 'idx_source_wildcard');
         });
     }

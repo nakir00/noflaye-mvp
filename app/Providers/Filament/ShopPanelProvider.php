@@ -32,6 +32,10 @@ class ShopPanelProvider extends PanelProvider
                 'primary' => Color::Blue,
             ])
             ->discoverResources(in: app_path('Filament/Shop/Resources'), for: 'App\\Filament\\Shop\\Resources')
+
+            // Découverte des clusters
+            ->discoverClusters(in: app_path('Filament/Shop/Clusters'), for: 'App\\Filament\\Shop\\Clusters')
+
             ->discoverPages(in: app_path('Filament/Shop/Pages'), for: 'App\\Filament\\Shop\\Pages')
             ->pages([
                 Pages\Dashboard::class,

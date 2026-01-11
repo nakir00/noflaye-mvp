@@ -28,7 +28,7 @@ class UserGroupObserver
         }
 
         // Auto-assign template if configured
-        if ($userGroup->template_id && $userGroup->auto_sync_template) {
+        if ($userGroup->permission_template_id && $userGroup->auto_sync_template) {
             $this->syncTemplateToUsers($userGroup);
         }
 
@@ -56,7 +56,7 @@ class UserGroupObserver
         }
 
         // Re-sync template if changed or auto_sync enabled
-        if ($userGroup->isDirty('template_id') && $userGroup->auto_sync_template) {
+        if ($userGroup->isDirty('permission_template_id') && $userGroup->auto_sync_template) {
             $this->syncTemplateToUsers($userGroup);
         }
     }
@@ -125,7 +125,7 @@ class UserGroupObserver
      */
     private function syncTemplateToUsers(UserGroup $userGroup): void
     {
-        if (! $userGroup->template_id) {
+        if (! $userGroup->permission_template_id) {
             return;
         }
 
@@ -133,7 +133,7 @@ class UserGroupObserver
         // For now, just log
         Log::info('Template sync needed', [
             'group_id' => $userGroup->id,
-            'template_id' => $userGroup->template_id,
+            'permission_template_id' => $userGroup->permission_template_id,
             'users_count' => $userGroup->users()->count(),
         ]);
     }

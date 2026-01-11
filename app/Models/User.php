@@ -201,7 +201,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
      */
     public function templates(): BelongsToMany
     {
-        return $this->belongsToMany(PermissionTemplate::class, 'user_templates', 'user_id', 'template_id')
+        return $this->belongsToMany(PermissionTemplate::class, 'user_templates', 'user_id', 'permission_template_id')
             ->withPivot('scope_id', 'template_version', 'auto_upgrade', 'auto_sync', 'valid_from', 'valid_until')
             ->withTimestamps();
     }
@@ -214,6 +214,14 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         return $this->belongsToMany(Permission::class, 'user_permissions')
             ->withPivot(['scope_id', 'expires_at', 'source', 'source_id', 'conditions'])
             ->withTimestamps();
+    }
+
+    /**
+     * Only direct permissions (not from templates or inherited)
+     */
+    public function directPermissions(): BelongsToMany
+    {
+        return $this->permissions()->wherePivot('source', 'direct');
     }
 
     public function shops(): BelongsToMany
@@ -267,6 +275,33 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     {
         return $this->hasMany(Scope::class, 'scopable_id')
             ->where('scopable_type', self::class);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // GESTION TEMPLATES
+    // ═══════════════════════════════════════════════════════
+
+    /**
+     * Assigne un template à l'utilisateur
+     */
+    public function assignTemplate(PermissionTemplate $template, ?int $scopeId = null, bool $isPrimary = false): void
+    {
+        // Si c'est le premier template, le définir comme primaire
+        if ($isPrimary || (! $this->primary_template_id && $this->templates()->count() === 0)) {
+            $this->update(['primary_template_id' => $template->id]);
+        }
+
+        // Attacher le template s'il n'est pas déjà attaché
+        if (! $this->templates()->where('permission_templates.id', $template->id)->exists()) {
+            $this->templates()->attach($template->id, [
+                'scope_id' => $scopeId,
+                'template_version' => 1,
+                'auto_upgrade' => true,
+                'auto_sync' => $template->auto_sync_users,
+                'valid_from' => now(),
+                'valid_until' => null,
+            ]);
+        }
     }
 
     // ═══════════════════════════════════════════════════════
@@ -376,13 +411,32 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         return false;
     }
 
+    /**
+     * Get all permissions for the user (direct + template + delegated)
+     */
+    public function getAllPermissions(?Scope $scope = null): \Illuminate\Support\Collection
+    {
+        return app(\App\Services\Permissions\PermissionChecker::class)
+            ->getAllUserPermissions($this, $scope);
+    }
+
+    /**
+     * Get effective permissions (alias for getAllPermissions for clarity)
+     */
+    public function getEffectivePermissions(?Scope $scope = null): \Illuminate\Support\Collection
+    {
+        return $this->getAllPermissions($scope);
+    }
+
     // ═══════════════════════════════════════════════════════
     // FILAMENT - ACCÈS PANELS
     // ═══════════════════════════════════════════════════════
 
     public function canAccessPanel(Panel $panel): bool
     {
+        return true;
         $panelId = $panel->getId();
+        dd($panelId);
 
         return match ($panelId) {
             'admin' => $this->hasAnyRole(['super_admin', 'admin']),
@@ -398,6 +452,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     public function getTenants(Panel $panel): Collection
     {
         $panelId = $panel->getId();
+        dd($panelId);
 
         return match ($panelId) {
             'admin' => collect([]),

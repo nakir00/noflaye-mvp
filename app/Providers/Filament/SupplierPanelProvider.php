@@ -32,6 +32,10 @@ class SupplierPanelProvider extends PanelProvider
                 'primary' => Color::Teal,
             ])
             ->discoverResources(in: app_path('Filament/Supplier/Resources'), for: 'App\Filament\Supplier\Resources')
+
+            // Découverte des clusters
+            ->discoverClusters(in: app_path('Filament/Supplier/Clusters'), for: 'App\Filament\Supplier\Clusters')
+
             ->discoverPages(in: app_path('Filament/Supplier/Pages'), for: 'App\Filament\Supplier\Pages')
             ->pages([
                 Dashboard::class,

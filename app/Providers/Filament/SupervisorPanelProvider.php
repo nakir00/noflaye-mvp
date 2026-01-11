@@ -32,6 +32,10 @@ class SupervisorPanelProvider extends PanelProvider
                 'primary' => Color::Purple,
             ])
             ->discoverResources(in: app_path('Filament/Supervisor/Resources'), for: 'App\\Filament\\Supervisor\\Resources')
+
+            // Découverte des clusters
+            ->discoverClusters(in: app_path('Filament/Supervisor/Clusters'), for: 'App\\Filament\\Supervisor\\Clusters')
+
             ->discoverPages(in: app_path('Filament/Supervisor/Pages'), for: 'App\\Filament\\Supervisor\\Pages')
             ->pages([
                 Pages\Dashboard::class,

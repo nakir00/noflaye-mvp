@@ -20,7 +20,7 @@ use Illuminate\Support\Collection;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int|null $parent_id
  * @property int $level
- * @property int|null $template_id
+ * @property int|null $permission_template_id
  * @property bool $auto_sync_template
  * @property-read \Illuminate\Database\Eloquent\Collection<int, UserGroup> $children
  * @property-read int|null $children_count
@@ -58,7 +58,7 @@ class UserGroup extends Model
     protected $fillable = [
         'parent_id',
         'level',
-        'template_id',
+        'permission_template_id',
         'auto_sync_template',
         'name',
         'slug',
@@ -78,7 +78,7 @@ class UserGroup extends Model
             // Integer columns
             'parent_id' => 'integer',
             'level' => 'integer',
-            'template_id' => 'integer',
+            'permission_template_id' => 'integer',
             'groupable_id' => 'integer',
 
             // Boolean columns
@@ -106,7 +106,7 @@ class UserGroup extends Model
 
     public function template(): BelongsTo
     {
-        return $this->belongsTo(PermissionTemplate::class, 'template_id');
+        return $this->belongsTo(PermissionTemplate::class, 'permission_template_id');
     }
 
     public function users(): BelongsToMany
@@ -135,7 +135,7 @@ class UserGroup extends Model
         $permissions = collect();
 
         // Permissions from template
-        if ($this->template_id && $this->template) {
+        if ($this->permission_template_id && $this->template) {
             $permissions = $permissions->merge($this->template->getAllPermissions());
         }
 

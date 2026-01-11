@@ -4,7 +4,7 @@ namespace App\Observers;
 
 use App\Models\PermissionTemplate;
 use App\Models\User;
-use Illuminate\Support\Facades\Cache;
+use App\Support\TaggableCache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -122,6 +122,6 @@ class UserObserver
      */
     private function clearUserCache(User $user): void
     {
-        Cache::tags(['users', "user.{$user->id}"])->flush();
+        TaggableCache::flushTags(['users', "user.{$user->id}"]);
     }
 }

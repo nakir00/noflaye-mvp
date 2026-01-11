@@ -27,8 +27,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->comment('User ID');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            $table->unsignedBigInteger('template_id')->comment('Permission template ID');
-            $table->foreign('template_id')->references('id')->on('permission_templates')->onDelete('cascade');
+            $table->unsignedBigInteger('permission_template_id')->comment('Permission template ID');
+            $table->foreign('permission_template_id')->references('id')->on('permission_templates')->onDelete('cascade');
 
             // Scope
             $table->unsignedBigInteger('scope_id')->nullable()->comment('Scoped template assignment');
@@ -53,7 +53,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Unique constraint and indexes
-            $table->unique(['user_id', 'template_id', 'scope_id'], 'unique_user_template_scope');
+            $table->unique(['user_id', 'permission_template_id', 'scope_id'], 'unique_user_template_scope');
             $table->index(['template_version', 'auto_upgrade'], 'idx_user_templates_versioning');
             $table->index(['valid_from', 'valid_until'], 'idx_user_templates_validity');
         });

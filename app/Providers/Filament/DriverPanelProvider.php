@@ -32,6 +32,10 @@ class DriverPanelProvider extends PanelProvider
                 'primary' => Color::Green,
             ])
             ->discoverResources(in: app_path('Filament/Driver/Resources'), for: 'App\\Filament\\Driver\\Resources')
+
+            // Découverte des clusters
+            ->discoverClusters(in: app_path('Filament/Driver/Clusters'), for: 'App\\Filament\\Driver\\Clusters')
+
             ->discoverPages(in: app_path('Filament/Driver/Pages'), for: 'App\\Filament\\Driver\\Pages')
             ->pages([
                 Pages\Dashboard::class,

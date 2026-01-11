@@ -17,16 +17,41 @@ class MyPermissions extends Page
 
     protected static ?string $title = 'My Permissions';
 
-    public function getViewData(): array
+    public function getUserProperty()
     {
-        $user = Auth::user();
+        return Auth::user();
+    }
 
-        return [
-            'user' => $user,
-            'roles' => $user->roles()->with('permissions')->get(),
-            'directPermissions' => $user->permissions,
-            'inheritedPermissions' => $user->roles->flatMap->permissions->unique('id'),
-            'groups' => $user->userGroups()->with('permissions')->get(),
-        ];
+    public function getTemplatesProperty()
+    {
+        return $this->user->templates()
+            ->with(['permissions', 'wildcards'])
+            ->withPivot(['scope_id', 'template_version', 'auto_upgrade', 'auto_sync', 'valid_from', 'valid_until'])
+            ->get();
+    }
+
+    public function getPrimaryTemplateProperty()
+    {
+        return $this->user->primaryTemplate;
+    }
+
+    public function getDirectPermissionsProperty()
+    {
+        return $this->user->directPermissions()->with('group')->get();
+    }
+
+    public function getAllPermissionsProperty()
+    {
+        return $this->user->getAllPermissions();
+    }
+
+    public function getEffectivePermissionsProperty()
+    {
+        return $this->user->getEffectivePermissions();
+    }
+
+    public function getDelegationsProperty()
+    {
+        return $this->user->delegationsReceived()->with(['delegator', 'permission'])->get();
     }
 }

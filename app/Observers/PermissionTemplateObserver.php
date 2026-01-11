@@ -73,7 +73,7 @@ class PermissionTemplateObserver
 
         if ($usersCount > 0) {
             Log::warning('Attempted to delete template with users', [
-                'template_id' => $template->id,
+                'permission_template_id' => $template->id,
                 'users_count' => $usersCount,
             ]);
 
@@ -101,7 +101,7 @@ class PermissionTemplateObserver
         }
 
         Log::info('Template synced to users', [
-            'template_id' => $template->id,
+            'permission_template_id' => $template->id,
             'users_count' => $users->count(),
         ]);
     }

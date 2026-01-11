@@ -5,7 +5,9 @@
       "Bash(./artisan:*)",
       "Bash(npm install:*)",
       "Bash(export PATH=\"/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\")",
-      "Bash(php artisan:*)"
+      "Bash(php artisan:*)",
+      "mcp__laravel-boost__application-info",
+      "mcp__laravel-boost__database-schema"
     ]
   },
   "enableAllProjectMcpServers": true,

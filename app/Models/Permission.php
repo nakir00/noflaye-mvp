@@ -204,9 +204,27 @@ class Permission extends Model
 
     public function templates(): BelongsToMany
     {
-        return $this->belongsToMany(PermissionTemplate::class, 'template_permissions', 'permission_id', 'template_id')
+        return $this->belongsToMany(PermissionTemplate::class, 'template_permissions', 'permission_id', 'permission_template_id')
             ->withPivot('source', 'wildcard_id', 'sort_order')
             ->withTimestamps();
+    }
+
+    /**
+     * Users who have this permission (direct assignments)
+     */
+    public function userPermissions(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_permissions', 'permission_id', 'user_id')
+            ->withPivot(['scope_id', 'expires_at', 'source', 'source_id', 'conditions'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Users who have this permission (alias for consistency)
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->userPermissions();
     }
 
     public function userGroups(): BelongsToMany

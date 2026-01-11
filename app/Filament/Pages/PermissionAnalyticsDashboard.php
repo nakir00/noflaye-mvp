@@ -30,6 +30,14 @@ class PermissionAnalyticsDashboard extends Page
     protected static ?string $navigationLabel = 'Analytics';
 
     /**
+     * Check if this page has header widgets
+     */
+    public function hasHeaderWidgets(): bool
+    {
+        return count($this->getHeaderWidgets()) > 0;
+    }
+
+    /**
      * Get the header widgets for this page
      *
      * @return array<class-string>
