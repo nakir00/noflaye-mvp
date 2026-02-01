@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Models\Driver;
+use App\Services\PanelNavigationService;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -28,6 +29,7 @@ class DriverPanelProvider extends PanelProvider
             ->path('driver')
             ->login()
             ->tenant(Driver::class, ownershipRelationship: 'users')
+            ->tenantMenuItems(PanelNavigationService::getMenuItemsForDriver())
             ->colors([
                 'primary' => Color::Green,
             ])

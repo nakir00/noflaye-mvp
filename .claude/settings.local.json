@@ -7,7 +7,14 @@
       "Bash(export PATH=\"/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin\")",
       "Bash(php artisan:*)",
       "mcp__laravel-boost__application-info",
-      "mcp__laravel-boost__database-schema"
+      "mcp__laravel-boost__database-schema",
+      "mcp__laravel-boost__search-docs",
+      "Bash(/usr/local/bin/php vendor/bin/pint:*)",
+      "WebFetch(domain:filamentphp.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(/usr/local/bin/php artisan view:clear:*)",
+      "WebFetch(domain:filamentmastery.com)",
+      "Bash(/usr/local/bin/php artisan migrate:fresh:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -3,7 +3,6 @@
 namespace App\Filament\Supervisor\Clusters\Management\Resources\Supervisors;
 
 use App\Filament\Supervisor\Clusters\Management\ManagementCluster;
-use App\Filament\Supervisor\Clusters\Management\Resources\Supervisors\Pages;
 use App\Models\Supervisor;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -105,10 +104,10 @@ class SupervisorResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // UsersRelationManager::class,
-            // ShopsRelationManager::class,
-            // KitchensRelationManager::class,
-            // DriversRelationManager::class,
+            RelationManagers\UsersRelationManager::class,
+            RelationManagers\ShopsRelationManager::class,
+            RelationManagers\KitchensRelationManager::class,
+            RelationManagers\DriversRelationManager::class,
         ];
     }
 

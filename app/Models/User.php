@@ -434,17 +434,20 @@ class User extends Authenticatable implements FilamentUser, HasTenants
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
         $panelId = $panel->getId();
-        dd($panelId);
+
+        // Super admins can access all panels
+        if ($this->hasAnyTemplate(['super_admin', 'admin'])) {
+            return true;
+        }
 
         return match ($panelId) {
-            'admin' => $this->hasAnyRole(['super_admin', 'admin']),
-            'shop' => $this->hasAnyRole(['shop_manager', 'shop_staff']) || $this->shops()->exists(),
-            'kitchen' => $this->hasAnyRole(['kitchen_manager', 'kitchen_staff']) || $this->kitchens()->exists(),
-            'driver' => $this->hasRole('driver') || $this->drivers()->exists(),
-            'supplier' => $this->hasAnyRole(['supplier_manager', 'supplier_staff']) || $this->suppliers()->exists(),
-            'supervisor' => $this->hasAnyRole(['supervisor_manager', 'supervisor_staff']) || $this->supervisors()->exists(),
+            'admin' => $this->hasAnyTemplate(['super_admin', 'admin']),
+            'shop' => $this->hasAnyTemplate(['shop_manager', 'shop_staff']) || $this->shops()->exists(),
+            'kitchen' => $this->hasAnyTemplate(['kitchen_manager', 'kitchen_staff']) || $this->kitchens()->exists(),
+            'driver' => $this->hasTemplate('driver') || $this->drivers()->exists(),
+            'supplier' => $this->hasAnyTemplate(['supplier_manager', 'supplier_staff']) || $this->suppliers()->exists(),
+            'supervisor' => $this->hasAnyTemplate(['supervisor_manager', 'supervisor_staff']) || $this->supervisors()->exists(),
             default => false,
         };
     }
@@ -452,22 +455,21 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     public function getTenants(Panel $panel): Collection
     {
         $panelId = $panel->getId();
-        dd($panelId);
 
         return match ($panelId) {
             'admin' => collect([]),
-            'shop' => $this->hasAnyRole(['super_admin', 'admin']) ? Shop::all() : $this->shops,
-            'kitchen' => $this->hasAnyRole(['super_admin', 'admin']) ? Kitchen::all() : $this->kitchens,
-            'driver' => $this->hasAnyRole(['super_admin', 'admin']) ? Driver::all() : $this->drivers,
-            'supplier' => $this->hasAnyRole(['super_admin', 'admin']) ? Supplier::all() : $this->suppliers,
-            'supervisor' => $this->hasAnyRole(['super_admin', 'admin']) ? Supervisor::all() : $this->supervisors,
+            'shop' => $this->hasAnyTemplate(['super_admin', 'admin']) ? Shop::all() : $this->shops,
+            'kitchen' => $this->hasAnyTemplate(['super_admin', 'admin']) ? Kitchen::all() : $this->kitchens,
+            'driver' => $this->hasAnyTemplate(['super_admin', 'admin']) ? Driver::all() : $this->drivers,
+            'supplier' => $this->hasAnyTemplate(['super_admin', 'admin']) ? Supplier::all() : $this->suppliers,
+            'supervisor' => $this->hasAnyTemplate(['super_admin', 'admin']) ? Supervisor::all() : $this->supervisors,
             default => collect([]),
         };
     }
 
     public function canAccessTenant(Model $tenant): bool
     {
-        if ($this->hasAnyRole(['super_admin', 'admin'])) {
+        if ($this->hasAnyTemplate(['super_admin', 'admin'])) {
             return true;
         }
 

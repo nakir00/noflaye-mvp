@@ -3,7 +3,6 @@
 namespace App\Filament\Driver\Clusters\Profile\Resources\Drivers;
 
 use App\Filament\Driver\Clusters\Profile\ProfileCluster;
-use App\Filament\Driver\Clusters\Profile\Resources\Drivers\Pages;
 use App\Models\Driver;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -112,8 +111,8 @@ class DriverResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // ShopsRelationManager::class,
-            // KitchensRelationManager::class,
+            RelationManagers\ShopsRelationManager::class,
+            RelationManagers\KitchensRelationManager::class,
         ];
     }
 

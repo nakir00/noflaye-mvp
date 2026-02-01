@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Models\Supervisor;
+use App\Services\PanelNavigationService;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -28,6 +29,7 @@ class SupervisorPanelProvider extends PanelProvider
             ->path('supervisor')
             ->login()
             ->tenant(Supervisor::class)
+            ->tenantMenuItems(PanelNavigationService::getMenuItemsForSupervisor())
             ->colors([
                 'primary' => Color::Purple,
             ])

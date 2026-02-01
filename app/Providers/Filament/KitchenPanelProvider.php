@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Models\Kitchen;
+use App\Services\PanelNavigationService;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -28,6 +29,7 @@ class KitchenPanelProvider extends PanelProvider
             ->path('kitchen')
             ->login()
             ->tenant(Kitchen::class)
+            ->tenantMenuItems(PanelNavigationService::getMenuItemsForKitchen())
             ->colors([
                 'primary' => Color::Orange,
             ])

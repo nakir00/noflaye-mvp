@@ -8,7 +8,7 @@ use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Component;
 use Illuminate\Database\Eloquent\Model;
 
-class AdminRegister extends Register
+class CustomRegister extends Register
 {
     /**
      * Customize the registration form

@@ -3,7 +3,6 @@
 namespace App\Filament\Kitchen\Clusters\Operations\Resources\Kitchens;
 
 use App\Filament\Kitchen\Clusters\Operations\OperationsCluster;
-use App\Filament\Kitchen\Clusters\Operations\Resources\Kitchens\Pages;
 use App\Models\Kitchen;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -105,9 +104,9 @@ class KitchenResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // UsersRelationManager::class,
-            // ShopsRelationManager::class,
-            // DriversRelationManager::class,
+            RelationManagers\UsersRelationManager::class,
+            RelationManagers\ShopsRelationManager::class,
+            RelationManagers\DriversRelationManager::class,
         ];
     }
 

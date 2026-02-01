@@ -3,7 +3,6 @@
 namespace App\Filament\Admin\Clusters\Business\Resources\Shops;
 
 use App\Filament\Admin\Clusters\Business\BusinessCluster;
-use App\Filament\Admin\Clusters\Business\Resources\Shops\Pages;
 use App\Models\Shop;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -99,10 +98,10 @@ class ShopResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // RelationManagers\UsersRelationManager::class, // TODO: Create this RelationManager
-            // RelationManagers::KitchensRelationManager::class, // TODO: Create this RelationManager
-            // RelationManagers::DriversRelationManager::class, // TODO: Create this RelationManager
-            // RelationManagers::UserGroupsRelationManager::class, // TODO: Create this RelationManager
+            RelationManagers\UsersRelationManager::class,
+            RelationManagers\KitchensRelationManager::class,
+            RelationManagers\DriversRelationManager::class,
+            RelationManagers\SupervisorsRelationManager::class,
         ];
     }
 

@@ -42,7 +42,7 @@ class DemoDataSeeder extends Seeder
     }
 
     /**
-     * Create shops
+     * Create shops (8 shops for testing)
      */
     protected function createShops(): array
     {
@@ -74,6 +74,51 @@ class DemoDataSeeder extends Seeder
                 'address' => '789 Beach Road, Almadies',
                 'phone' => '+221771234569',
                 'email' => 'almadies@noflaye.com',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Perfect Shoes',
+                'slug' => 'perfect-shoes',
+                'description' => 'Premium shoe store',
+                'address' => '100 Fashion Street, Dakar',
+                'phone' => '+221771234580',
+                'email' => 'contact@perfectshoes.sn',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Almamy Bijouterie',
+                'slug' => 'almamy-bijouterie',
+                'description' => 'Fine jewelry store',
+                'address' => '200 Luxury Avenue, Plateau',
+                'phone' => '+221771234581',
+                'email' => 'contact@almamy-bijouterie.sn',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Tech Store Dakar',
+                'slug' => 'tech-store-dakar',
+                'description' => 'Electronics and gadgets',
+                'address' => '300 Tech Park, Dakar',
+                'phone' => '+221771234582',
+                'email' => 'sales@techstore.sn',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Mode Fashion',
+                'slug' => 'mode-fashion',
+                'description' => 'Trendy fashion boutique',
+                'address' => '400 Style Street, Almadies',
+                'phone' => '+221771234583',
+                'email' => 'info@modefashion.sn',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Sénégal Artisanat',
+                'slug' => 'senegal-artisanat',
+                'description' => 'Local crafts and arts',
+                'address' => '500 Culture Lane, Gorée',
+                'phone' => '+221771234584',
+                'email' => 'contact@senegal-artisanat.sn',
                 'is_active' => true,
             ],
         ];
@@ -243,6 +288,13 @@ class DemoDataSeeder extends Seeder
                 'password' => $password,
                 'templates' => ['customer'],
             ],
+            // Multi-shop user for testing
+            [
+                'name' => 'Multi Shop Manager',
+                'email' => 'multishop@noflaye.com',
+                'password' => $password,
+                'templates' => ['shop-manager', 'driver', 'supervisor'],
+            ],
         ];
 
         $users = [];
@@ -288,11 +340,11 @@ class DemoDataSeeder extends Seeder
         // Charlie Multi → Noflaye Plateau + Driver
         $charlie = $users['charlie@noflaye.com'];
         $charlie->shops()->syncWithoutDetaching([$shops['noflaye-plateau']->id]);
-        Driver::updateOrCreate(
-            ['user_id' => $charlie->id],
+        $charlieDriver = Driver::updateOrCreate(
+            ['slug' => 'charlie-multi-driver'],
             [
+                'user_id' => $charlie->id,
                 'name' => $charlie->name,
-                'slug' => 'charlie-multi-driver',
                 'vehicle_type' => 'Motorcycle',
                 'vehicle_number' => 'DRV-001',
                 'license_number' => 'LIC-001',
@@ -300,16 +352,17 @@ class DemoDataSeeder extends Seeder
                 'is_available' => true,
             ]
         );
+        $charlie->drivers()->syncWithoutDetaching([$charlieDriver->id]);
         $this->command->info("   ✓ {$charlie->name} → {$shops['noflaye-plateau']->name} + Driver (Motorcycle)");
 
         // Diana Worker → Downtown Kitchen + Driver
         $diana = $users['diana@noflaye.com'];
         $diana->kitchens()->syncWithoutDetaching([$kitchens['downtown-kitchen']->id]);
-        Driver::updateOrCreate(
-            ['user_id' => $diana->id],
+        $dianaDriver = Driver::updateOrCreate(
+            ['slug' => 'diana-worker-driver'],
             [
+                'user_id' => $diana->id,
                 'name' => $diana->name,
-                'slug' => 'diana-worker-driver',
                 'vehicle_type' => 'Scooter',
                 'vehicle_number' => 'DRV-002',
                 'license_number' => 'LIC-002',
@@ -317,18 +370,20 @@ class DemoDataSeeder extends Seeder
                 'is_available' => true,
             ]
         );
+        $diana->drivers()->syncWithoutDetaching([$dianaDriver->id]);
         $this->command->info("   ✓ {$diana->name} → {$kitchens['downtown-kitchen']->name} + Driver (Scooter)");
 
         // Eve Supervisor → Supervisor profile
         $eve = $users['eve@noflaye.com'];
-        Supervisor::updateOrCreate(
-            ['user_id' => $eve->id],
+        $eveSupervisor = Supervisor::updateOrCreate(
+            ['slug' => 'eve-supervisor'],
             [
+                'user_id' => $eve->id,
                 'name' => $eve->name,
-                'slug' => 'eve-supervisor',
                 'is_active' => true,
             ]
         );
+        $eve->supervisors()->syncWithoutDetaching([$eveSupervisor->id]);
         $this->command->info("   ✓ {$eve->name} → Supervisor");
 
         // Frank Flexible → Downtown + Almadies shops + Driver
@@ -337,11 +392,11 @@ class DemoDataSeeder extends Seeder
             $shops['noflaye-downtown']->id,
             $shops['noflaye-almadies']->id,
         ]);
-        Driver::updateOrCreate(
-            ['user_id' => $frank->id],
+        $frankDriver = Driver::updateOrCreate(
+            ['slug' => 'frank-flexible-driver'],
             [
+                'user_id' => $frank->id,
                 'name' => $frank->name,
-                'slug' => 'frank-flexible-driver',
                 'vehicle_type' => 'Car',
                 'vehicle_number' => 'DRV-003',
                 'license_number' => 'LIC-003',
@@ -349,15 +404,16 @@ class DemoDataSeeder extends Seeder
                 'is_available' => true,
             ]
         );
+        $frank->drivers()->syncWithoutDetaching([$frankDriver->id]);
         $this->command->info("   ✓ {$frank->name} → Multi-Shop (Downtown + Almadies) + Driver (Car)");
 
         // Grace Driver → Pure driver
         $grace = $users['grace@noflaye.com'];
-        Driver::updateOrCreate(
-            ['user_id' => $grace->id],
+        $graceDriver = Driver::updateOrCreate(
+            ['slug' => 'grace-driver'],
             [
+                'user_id' => $grace->id,
                 'name' => $grace->name,
-                'slug' => 'grace-driver',
                 'vehicle_type' => 'Motorcycle',
                 'vehicle_number' => 'DRV-004',
                 'license_number' => 'LIC-004',
@@ -365,6 +421,59 @@ class DemoDataSeeder extends Seeder
                 'is_available' => true,
             ]
         );
+        $grace->drivers()->syncWithoutDetaching([$graceDriver->id]);
         $this->command->info("   ✓ {$grace->name} → Pure Driver (Motorcycle)");
+
+        // Multi Shop Manager → 4 shops + 2 drivers + 1 supervisor
+        $multiShop = $users['multishop@noflaye.com'];
+        $multiShop->shops()->syncWithoutDetaching([
+            $shops['perfect-shoes']->id,
+            $shops['almamy-bijouterie']->id,
+            $shops['tech-store-dakar']->id,
+            $shops['mode-fashion']->id,
+        ]);
+
+        // Create driver for Perfect Shoes
+        $multiDriver1 = Driver::updateOrCreate(
+            ['slug' => 'multishop-driver-perfectshoes'],
+            [
+                'user_id' => $multiShop->id,
+                'name' => 'Driver Perfect Shoes',
+                'vehicle_type' => 'Van',
+                'vehicle_number' => 'DRV-MS1',
+                'license_number' => 'LIC-MS1',
+                'is_active' => true,
+                'is_available' => true,
+            ]
+        );
+        $multiShop->drivers()->syncWithoutDetaching([$multiDriver1->id]);
+
+        // Create driver for Almamy
+        $multiDriver2 = Driver::updateOrCreate(
+            ['slug' => 'multishop-driver-almamy'],
+            [
+                'user_id' => $multiShop->id,
+                'name' => 'Driver Almamy Bijouterie',
+                'vehicle_type' => 'Motorcycle',
+                'vehicle_number' => 'DRV-MS2',
+                'license_number' => 'LIC-MS2',
+                'is_active' => true,
+                'is_available' => true,
+            ]
+        );
+        $multiShop->drivers()->syncWithoutDetaching([$multiDriver2->id]);
+
+        // Create supervisor for Almamy
+        $multiSupervisor = Supervisor::updateOrCreate(
+            ['slug' => 'multishop-supervisor-almamy'],
+            [
+                'user_id' => $multiShop->id,
+                'name' => 'Superviseur Almamy Bijouterie',
+                'is_active' => true,
+            ]
+        );
+        $multiShop->supervisors()->syncWithoutDetaching([$multiSupervisor->id]);
+
+        $this->command->info("   ✓ {$multiShop->name} → 4 Shops + 2 Drivers + 1 Supervisor");
     }
 }

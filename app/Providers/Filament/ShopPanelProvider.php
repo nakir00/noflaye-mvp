@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Models\Shop;
+use App\Services\PanelNavigationService;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -28,6 +29,7 @@ class ShopPanelProvider extends PanelProvider
             ->path('shop')
             ->login()
             ->tenant(Shop::class)
+            ->tenantMenuItems(PanelNavigationService::getMenuItemsForShop())
             ->colors([
                 'primary' => Color::Blue,
             ])
