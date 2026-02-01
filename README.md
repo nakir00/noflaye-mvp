@@ -1,59 +1,228 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Noflaye MVP
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Plateforme multi-tenant de gestion commerciale avec architecture multi-panels Filament.
 
-## About Laravel
+## Stack Technique
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Technologie | Version |
+|-------------|---------|
+| PHP | 8.4 |
+| Laravel | 12 |
+| Filament | 4 |
+| Inertia.js | 2 |
+| React | 18 |
+| Livewire | 3 |
+| Tailwind CSS | 3 |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Architecture Multi-Panels
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Le projet utilise une architecture multi-panels Filament avec 6 panels distincts :
 
-## Learning Laravel
+| Panel | Chemin | Couleur | Description |
+|-------|--------|---------|-------------|
+| **Admin** | `/admin` | Rouge | Gestion globale du système |
+| **Shop** | `/shop/{id}` | Bleu | Gestion des boutiques |
+| **Kitchen** | `/kitchen/{id}` | Orange | Gestion des cuisines |
+| **Driver** | `/driver/{id}` | Vert | Interface chauffeurs/livreurs |
+| **Supervisor** | `/supervisor/{id}` | Violet | Supervision des opérations |
+| **Supplier** | `/supplier/{id}` | Teal | Gestion des fournisseurs |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Multi-Tenancy
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Chaque panel (sauf Admin) utilise la multi-tenancy Filament :
+- Un utilisateur peut avoir accès à plusieurs tenants de types différents
+- Navigation entre panels via le menu tenant
+- Isolation des données par tenant
 
-## Laravel Sponsors
+## Système de Permissions
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Permission Templates
 
-### Premium Partners
+Le système utilise des "templates de permissions" plutôt que des rôles traditionnels :
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+| Template | Description | Panels accessibles |
+|----------|-------------|-------------------|
+| `super-admin` | Accès total | Admin |
+| `admin` | Administration | Admin |
+| `shop-manager` | Gérant de boutique | Shop |
+| `shop-staff` | Personnel boutique | Shop |
+| `kitchen-manager` | Chef de cuisine | Kitchen |
+| `kitchen-staff` | Personnel cuisine | Kitchen |
+| `driver` | Chauffeur/Livreur | Driver |
+| `supervisor` | Superviseur | Supervisor |
+| `customer` | Client | - |
 
-## Contributing
+### Composants du système
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
+app/
+├── Enums/
+│   └── Permission.php          # Enum des permissions disponibles
+├── Models/
+│   ├── User.php                # Utilisateur avec HasTenants
+│   ├── PermissionTemplate.php  # Templates de permissions
+│   ├── Permission.php          # Permissions individuelles
+│   └── UserPermission.php      # Attribution des permissions
+├── Services/
+│   └── Permissions/
+│       ├── PermissionChecker.php
+│       ├── ScopeManager.php
+│       └── ...
+└── Policies/
+    ├── ShopPolicy.php
+    ├── KitchenPolicy.php
+    ├── DriverPolicy.php
+    ├── SupervisorPolicy.php
+    └── SupplierPolicy.php
+```
 
-## Code of Conduct
+## Modèles Principaux
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Modèle | Description | Relations |
+|--------|-------------|-----------|
+| `User` | Utilisateurs | shops, kitchens, drivers, supervisors, suppliers |
+| `Shop` | Boutiques | users (pivot) |
+| `Kitchen` | Cuisines | users (pivot) |
+| `Driver` | Chauffeurs | users (pivot) |
+| `Supervisor` | Superviseurs | users (pivot) |
+| `Supplier` | Fournisseurs | users (pivot) |
+| `Scope` | Périmètres | shops, kitchens, etc. |
 
-## Security Vulnerabilities
+## Installation
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+# Cloner le projet
+git clone <repo-url>
+cd noflaye-mvp
 
-## License
+# Installer les dépendances
+composer install
+npm install
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Configuration
+cp .env.example .env
+php artisan key:generate
+
+# Base de données
+php artisan migrate --seed
+
+# Build assets
+npm run build
+
+# Lancer le serveur
+php artisan serve
+```
+
+## Comptes de Test
+
+| Rôle | Email | Mot de passe | Panels |
+|------|-------|--------------|--------|
+| Super Admin | `super@noflaye.com` | `password` | Admin |
+| Admin | `admin@noflaye.com` | `password` | Admin |
+| Shop Manager | `alice@noflaye.com` | `password` | Shop |
+| Kitchen Manager | `bob@noflaye.com` | `password` | Kitchen |
+| Multi-accès | `charlie@noflaye.com` | `password` | Shop, Driver |
+| Multi-accès | `frank@noflaye.com` | `password` | Shop (x2), Driver |
+| **Multi Shop** | `multishop@noflaye.com` | `password` | Shop (x4), Driver (x2), Supervisor |
+| Driver | `grace@noflaye.com` | `password` | Driver |
+| Supervisor | `eve@noflaye.com` | `password` | Supervisor |
+
+## Navigation Multi-Panels
+
+Les utilisateurs avec accès à plusieurs panels/tenants peuvent naviguer via le **menu tenant** :
+
+1. Cliquer sur le nom du tenant actuel dans la sidebar
+2. Le dropdown affiche tous les tenants accessibles :
+   - `boutique Perfect Shoes`
+   - `driver Driver Perfect Shoes`
+   - `superviseur Superviseur Almamy Bijouterie`
+3. Cliquer pour naviguer vers l'espace souhaité
+
+## Structure des Fichiers
+
+```
+app/
+├── Filament/
+│   ├── Admin/           # Panel Admin
+│   │   └── Clusters/
+│   │       ├── AccessControl/
+│   │       └── Business/
+│   ├── Shop/            # Panel Shop
+│   │   └── Clusters/
+│   ├── Kitchen/         # Panel Kitchen
+│   │   └── Clusters/
+│   ├── Driver/          # Panel Driver
+│   │   └── Clusters/
+│   ├── Supervisor/      # Panel Supervisor
+│   │   └── Clusters/
+│   └── Supplier/        # Panel Supplier
+│       └── Clusters/
+├── Models/
+├── Policies/
+├── Providers/
+│   ├── AppServiceProvider.php
+│   ├── AuthServiceProvider.php
+│   └── Filament/
+│       ├── AdminPanelProvider.php
+│       ├── ShopPanelProvider.php
+│       ├── KitchenPanelProvider.php
+│       ├── DriverPanelProvider.php
+│       ├── SupervisorPanelProvider.php
+│       └── SupplierPanelProvider.php
+└── Services/
+    ├── PanelNavigationService.php
+    └── Permissions/
+```
+
+## Commandes Utiles
+
+```bash
+# Rafraîchir la base avec les seeds
+php artisan migrate:fresh --seed
+
+# Vider les caches
+php artisan optimize:clear
+
+# Formater le code
+vendor/bin/pint
+
+# Analyse statique
+vendor/bin/phpstan analyse
+
+# Tests
+php artisan test
+```
+
+## Packages Principaux
+
+- **filament/filament** - Framework admin panels
+- **spatie/laravel-activitylog** - Journalisation des activités
+- **spatie/laravel-data** - DTOs et transformations
+- **spatie/laravel-query-builder** - API query building
+- **lorisleiva/laravel-actions** - Actions réutilisables
+- **inertiajs/inertia-laravel** - SPA sans API
+
+## Développement
+
+### Ajouter un nouveau Panel
+
+1. Créer le PanelProvider dans `app/Providers/Filament/`
+2. Enregistrer dans `bootstrap/providers.php`
+3. Créer la structure dans `app/Filament/{PanelName}/`
+4. Ajouter le template de permissions correspondant
+5. Mettre à jour `PanelNavigationService` si nécessaire
+
+### Ajouter une Permission
+
+1. Ajouter le cas dans `app/Enums/Permission.php`
+2. Mettre à jour les templates concernés
+3. Utiliser dans les policies avec `$user->hasPermission(Permission::CASE)`
+
+## Documentation
+
+- [Système d'autorisation](.claude/docs/authorization-system-complete.md)
+- [Implémentation des autorisations](.claude/docs/authorization-implementation.md)
+
+## Licence
+
+Propriétaire - Noflaye - Tous droits réservés
