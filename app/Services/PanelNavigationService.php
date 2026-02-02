@@ -80,35 +80,35 @@ class PanelNavigationService
 
             // Shops
             $menuItems["shop_{$i}"] = Action::make("nav_shop_{$i}")
-                ->label(fn (): string => self::getTenantLabel('shops', $idx, 'boutique'))
+                ->label(fn (): string => self::getTenantLabel('shops', $idx))
                 ->icon('heroicon-o-building-storefront')
                 ->url(fn (): string => self::getTenantUrl('shops', $idx, 'shop'))
                 ->visible(fn (): bool => self::isTenantVisible('shops', $idx, 'shop', $currentPanelId));
 
             // Kitchens
             $menuItems["kitchen_{$i}"] = Action::make("nav_kitchen_{$i}")
-                ->label(fn (): string => self::getTenantLabel('kitchens', $idx, 'cuisine'))
+                ->label(fn (): string => self::getTenantLabel('kitchens', $idx))
                 ->icon('heroicon-o-fire')
                 ->url(fn (): string => self::getTenantUrl('kitchens', $idx, 'kitchen'))
                 ->visible(fn (): bool => self::isTenantVisible('kitchens', $idx, 'kitchen', $currentPanelId));
 
             // Drivers
             $menuItems["driver_{$i}"] = Action::make("nav_driver_{$i}")
-                ->label(fn (): string => self::getTenantLabel('drivers', $idx, 'driver'))
+                ->label(fn (): string => self::getTenantLabel('drivers', $idx))
                 ->icon('heroicon-o-truck')
                 ->url(fn (): string => self::getTenantUrl('drivers', $idx, 'driver'))
                 ->visible(fn (): bool => self::isTenantVisible('drivers', $idx, 'driver', $currentPanelId));
 
             // Supervisors
             $menuItems["supervisor_{$i}"] = Action::make("nav_supervisor_{$i}")
-                ->label(fn (): string => self::getTenantLabel('supervisors', $idx, 'superviseur'))
+                ->label(fn (): string => self::getTenantLabel('supervisors', $idx))
                 ->icon('heroicon-o-eye')
                 ->url(fn (): string => self::getTenantUrl('supervisors', $idx, 'supervisor'))
                 ->visible(fn (): bool => self::isTenantVisible('supervisors', $idx, 'supervisor', $currentPanelId));
 
             // Suppliers
             $menuItems["supplier_{$i}"] = Action::make("nav_supplier_{$i}")
-                ->label(fn (): string => self::getTenantLabel('suppliers', $idx, 'fournisseur'))
+                ->label(fn (): string => self::getTenantLabel('suppliers', $idx))
                 ->icon('heroicon-o-cube')
                 ->url(fn (): string => self::getTenantUrl('suppliers', $idx, 'supplier'))
                 ->visible(fn (): bool => self::isTenantVisible('suppliers', $idx, 'supplier', $currentPanelId));
@@ -119,12 +119,14 @@ class PanelNavigationService
 
     /**
      * Get tenant label
+     *
+     * Returns just the tenant name - the icon already indicates the type
      */
-    private static function getTenantLabel(string $relation, int $index, string $prefix): string
+    private static function getTenantLabel(string $relation, int $index): string
     {
         $tenant = self::getUserWithRelations()?->{$relation}[$index] ?? null;
 
-        return $tenant ? "{$prefix} {$tenant->name}" : '';
+        return $tenant ? $tenant->name : '';
     }
 
     /**
@@ -139,9 +141,18 @@ class PanelNavigationService
 
     /**
      * Check if tenant is visible
+     *
+     * Hides items that match the current panel type since Filament's
+     * native tenant switcher already handles those.
      */
     private static function isTenantVisible(string $relation, int $index, string $panelId, string $currentPanelId): bool
     {
+        // Don't show items for the current panel type - Filament's native
+        // tenant switcher already handles switching between tenants of the same type
+        if ($currentPanelId === $panelId) {
+            return false;
+        }
+
         $user = self::getUserWithRelations();
         if (! $user) {
             return false;
@@ -150,14 +161,6 @@ class PanelNavigationService
         $tenant = $user->{$relation}[$index] ?? null;
         if (! $tenant) {
             return false;
-        }
-
-        // Don't show current tenant
-        if ($currentPanelId === $panelId) {
-            $currentTenant = Filament::getTenant();
-            if ($currentTenant && $currentTenant->id === $tenant->id) {
-                return false;
-            }
         }
 
         return true;
