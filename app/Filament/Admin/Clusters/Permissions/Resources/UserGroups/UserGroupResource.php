@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Filament\Admin\Clusters\Permissions\Resources\Templates;
+namespace App\Filament\Admin\Clusters\Permissions\Resources\UserGroups;
 
-use App\Models\Permission;
-use App\Models\PermissionTemplate;
+use App\Models\UserGroup;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -20,37 +19,38 @@ use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
- * PermissionTemplateResource
+ * UserGroupResource
  *
- * Filament resource for managing permission templates with hierarchy support.
+ * Filament resource for managing user groups with hierarchy support.
  * Supports:
- * - Hierarchical templates (parent/children)
- * - Permission inheritance from parent templates
+ * - Hierarchical groups (parent/children)
+ * - Permission inheritance from parent groups and templates
  * - Permission override (grant/deny) system
  *
  * @author Noflaye Box Team
  *
- * @version 2.0.0
+ * @version 1.0.0
  */
-class PermissionTemplateResource extends Resource
+class UserGroupResource extends Resource
 {
-    protected static ?string $model = PermissionTemplate::class;
+    protected static ?string $model = UserGroup::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $cluster = \App\Filament\Admin\Clusters\Permissions\PermissionsCluster::class;
 
     protected static string|UnitEnum|null $navigationGroup = 'Permissions';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $form): Schema
     {
         return $form
             ->components([
-                Section::make('Basic Information')
+                Section::make('Informations de base')
                     ->components([
                         Forms\Components\TextInput::make('name')
+                            ->label('Nom')
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
@@ -69,64 +69,81 @@ class PermissionTemplateResource extends Resource
                     ])
                     ->columns(2),
 
-                Section::make('Hierarchy & Scope')
+                Section::make('Hiérarchie')
                     ->components([
                         Forms\Components\Select::make('parent_id')
-                            ->label('Parent Template')
+                            ->label('Groupe Parent')
                             ->relationship('parent', 'name')
                             ->searchable()
                             ->preload(),
 
-                        Forms\Components\Select::make('scope_id')
-                            ->label('Scope')
-                            ->relationship('scope', 'name')
-                            ->searchable()
-                            ->preload(),
-                    ])
-                    ->columns(2),
-
-                Section::make('Appearance')
-                    ->components([
-                        Forms\Components\ColorPicker::make('color')
-                            ->required()
-                            ->default('#3B82F6'),
-
-                        Forms\Components\TextInput::make('icon')
-                            ->required()
-                            ->default('heroicon-o-shield-check')
-                            ->placeholder('heroicon-o-shield-check')
-                            ->helperText('Use Heroicons format'),
-
                         Forms\Components\TextInput::make('sort_order')
+                            ->label('Ordre de tri')
                             ->numeric()
                             ->default(0)
                             ->required(),
                     ])
-                    ->columns(3),
+                    ->columns(2),
+
+                Section::make('Template de permissions')
+                    ->description('Associer un template pour hériter automatiquement de ses permissions')
+                    ->components([
+                        Forms\Components\Select::make('permission_template_id')
+                            ->label('Template')
+                            ->relationship('template', 'name')
+                            ->searchable()
+                            ->preload(),
+
+                        Forms\Components\Toggle::make('auto_sync_template')
+                            ->label('Synchronisation automatique')
+                            ->default(true)
+                            ->inline(false)
+                            ->helperText('Mettre à jour automatiquement les permissions quand le template change'),
+                    ])
+                    ->columns(2),
 
                 Section::make('Permissions héritées')
-                    ->description('Permissions reçues du template parent')
+                    ->description('Permissions reçues du groupe parent et du template')
                     ->components([
                         Forms\Components\Placeholder::make('inherited_permissions_display')
                             ->label('')
-                            ->content(function (?PermissionTemplate $record): string {
-                                if (! $record || ! $record->parent_id) {
-                                    return 'Aucun parent - pas de permissions héritées';
+                            ->content(function (?UserGroup $record): string {
+                                if (! $record) {
+                                    return 'Sauvegardez d\'abord pour voir les permissions héritées';
                                 }
 
                                 $inherited = $record->getInheritedPermissions();
-                                if ($inherited->isEmpty()) {
-                                    return 'Le parent n\'a aucune permission';
+                                $template = $record->getTemplatePermissions();
+
+                                $lines = [];
+
+                                if ($template->isNotEmpty()) {
+                                    $lines[] = "📋 Du template ({$record->template?->name}):";
+                                    foreach ($template as $perm) {
+                                        $lines[] = "  • {$perm->name}";
+                                    }
                                 }
 
-                                return $inherited->pluck('name')->map(fn ($name) => "• {$name}")->implode("\n");
+                                if ($inherited->isNotEmpty()) {
+                                    $lines[] = '';
+                                    $lines[] = '👥 Des groupes parents:';
+                                    foreach ($inherited as $perm) {
+                                        $lines[] = "  • {$perm->name}";
+                                    }
+                                }
+
+                                if (empty($lines)) {
+                                    return 'Aucune permission héritée (pas de parent ni de template)';
+                                }
+
+                                return implode("\n", $lines);
                             }),
                     ])
-                    ->visible(fn (?PermissionTemplate $record): bool => $record?->parent_id !== null)
+                    ->visible(fn (?UserGroup $record): bool => $record !== null && ($record->parent_id !== null || $record->permission_template_id !== null))
                     ->collapsed(),
 
                 Section::make('Permissions accordées')
-                    ->description('Permissions directement attribuées à ce template')
+                    ->description('Permissions directement attribuées à ce groupe')
                     ->components([
                         Forms\Components\CheckboxList::make('grantedPermissions')
                             ->label('')
@@ -144,7 +161,7 @@ class PermissionTemplateResource extends Resource
                     ]),
 
                 Section::make('Permissions refusées (Override)')
-                    ->description('Permissions à bloquer (override les permissions héritées)')
+                    ->description('Permissions à bloquer (override les permissions héritées et du template)')
                     ->components([
                         Forms\Components\CheckboxList::make('deniedPermissions')
                             ->label('')
@@ -161,37 +178,7 @@ class PermissionTemplateResource extends Resource
                             ->columns(3),
                     ])
                     ->collapsed()
-                    ->visible(fn (?PermissionTemplate $record): bool => $record?->parent_id !== null),
-
-                Section::make('Wildcards')
-                    ->components([
-                        Forms\Components\CheckboxList::make('wildcards')
-                            ->relationship('wildcards', 'pattern')
-                            ->searchable()
-                            ->bulkToggleable()
-                            ->columns(3),
-                    ]),
-
-                Section::make('Options')
-                    ->components([
-                        Forms\Components\Toggle::make('is_active')
-                            ->label('Active')
-                            ->default(true)
-                            ->inline(false),
-
-                        Forms\Components\Toggle::make('is_system')
-                            ->label('System Template')
-                            ->default(false)
-                            ->inline(false)
-                            ->helperText('System templates cannot be deleted'),
-
-                        Forms\Components\Toggle::make('auto_sync_users')
-                            ->label('Auto Sync Users')
-                            ->default(true)
-                            ->inline(false)
-                            ->helperText('Automatically sync permissions to assigned users'),
-                    ])
-                    ->columns(3),
+                    ->visible(fn (?UserGroup $record): bool => $record !== null && ($record->parent_id !== null || $record->permission_template_id !== null)),
             ]);
     }
 
@@ -200,6 +187,7 @@ class PermissionTemplateResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nom')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
@@ -213,7 +201,13 @@ class PermissionTemplateResource extends Resource
                     ->label('Parent')
                     ->searchable()
                     ->sortable()
-                    ->placeholder('None'),
+                    ->placeholder('Aucun'),
+
+                Tables\Columns\TextColumn::make('template.name')
+                    ->label('Template')
+                    ->searchable()
+                    ->sortable()
+                    ->placeholder('Aucun'),
 
                 Tables\Columns\TextColumn::make('permissions_count')
                     ->counts('permissions')
@@ -221,24 +215,14 @@ class PermissionTemplateResource extends Resource
                     ->badge()
                     ->color('success'),
 
-                Tables\Columns\TextColumn::make('wildcards_count')
-                    ->counts('wildcards')
-                    ->label('Wildcards')
-                    ->badge()
-                    ->color('info'),
-
                 Tables\Columns\TextColumn::make('users_count')
                     ->counts('users')
-                    ->label('Users')
+                    ->label('Utilisateurs')
                     ->badge()
                     ->color('warning'),
 
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label('Active')
-                    ->boolean(),
-
-                Tables\Columns\IconColumn::make('is_system')
-                    ->label('System')
+                Tables\Columns\IconColumn::make('auto_sync_template')
+                    ->label('Auto sync')
                     ->boolean(),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -248,26 +232,24 @@ class PermissionTemplateResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('parent_id')
-                    ->label('Parent Template')
+                    ->label('Groupe Parent')
                     ->relationship('parent', 'name'),
 
-                Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Active'),
-
-                Tables\Filters\TernaryFilter::make('is_system')
-                    ->label('System Template'),
+                Tables\Filters\SelectFilter::make('permission_template_id')
+                    ->label('Template')
+                    ->relationship('template', 'name'),
             ])
             ->recordActions([
                 EditAction::make(),
 
                 DeleteAction::make()
                     ->requiresConfirmation()
-                    ->before(function (PermissionTemplate $record) {
-                        if ($record->is_system) {
-                            throw new \Exception('Cannot delete system template');
-                        }
+                    ->before(function (UserGroup $record) {
                         if ($record->users()->count() > 0) {
-                            throw new \Exception('Cannot delete template with assigned users');
+                            throw new \Exception('Impossible de supprimer un groupe avec des utilisateurs');
+                        }
+                        if ($record->children()->count() > 0) {
+                            throw new \Exception('Impossible de supprimer un groupe avec des sous-groupes');
                         }
                     }),
             ])
@@ -288,9 +270,9 @@ class PermissionTemplateResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPermissionTemplates::route('/'),
-            'create' => Pages\CreatePermissionTemplate::route('/create'),
-            'edit' => Pages\EditPermissionTemplate::route('/{record}/edit'),
+            'index' => Pages\ListUserGroups::route('/'),
+            'create' => Pages\CreateUserGroup::route('/create'),
+            'edit' => Pages\EditUserGroup::route('/{record}/edit'),
         ];
     }
 }

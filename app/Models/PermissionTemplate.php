@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasHierarchy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,11 +16,21 @@ use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
  * PermissionTemplate Model
  *
  * Templates for grouping permissions (replaces roles)
- * Supports hierarchy, wildcards, and versioning
+ * Supports hierarchy with full ancestry/descendant traversal and permission inheritance with override
+ *
+ * Hierarchy:
+ * - parent() → BelongsTo → direct parent via parent_id
+ * - parents() → BelongsToMany → all ancestors via hierarchy table (ordered by depth)
+ * - children() → HasMany → direct children via parent_id (ordered by sort_order)
+ * - allChildren() → BelongsToMany → all descendants via hierarchy table (ordered by depth, sort_order)
+ *
+ * Permission Inheritance:
+ * - Additive: child inherits all permissions from parents
+ * - Override: child can deny specific permissions to block inheritance
  *
  * @author Noflaye Box Team
  *
- * @version 1.0.0
+ * @version 2.0.0
  *
  * @property int $id
  * @property string $name
@@ -39,9 +50,15 @@ use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, PermissionTemplate> $children
  * @property-read int|null $children_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, PermissionTemplate> $allChildren
+ * @property-read int|null $all_children_count
  * @property-read PermissionTemplate|null $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, PermissionTemplate> $parents
+ * @property-read int|null $parents_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $grantedPermissions
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $deniedPermissions
  * @property-read \App\Models\Scope|null $scope
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
@@ -80,8 +97,14 @@ use Spatie\Activitylog\Traits\LogsActivity as LogsActivityTrait;
  */
 class PermissionTemplate extends Model
 {
+    use HasHierarchy;
     use LogsActivityTrait;
     use SoftDeletes;
+
+    /**
+     * The hierarchy table for closure table relationships.
+     */
+    protected string $hierarchyTable = 'permission_template_hierarchy';
 
     protected $fillable = [
         'name',
@@ -131,21 +154,33 @@ class PermissionTemplate extends Model
     // RELATIONSHIPS
     // ========================================
 
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(PermissionTemplate::class, 'parent_id');
-    }
+    // Note: parent(), parents(), children(), allChildren() are provided by HasHierarchy trait
 
-    public function children(): HasMany
-    {
-        return $this->hasMany(PermissionTemplate::class, 'parent_id');
-    }
-
+    /**
+     * Get all permissions (both granted and denied).
+     */
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'template_permissions', 'permission_template_id', 'permission_id')
-            ->withPivot('source', 'wildcard_id', 'sort_order')
+            ->withPivot('source', 'permission_type', 'wildcard_id', 'sort_order')
             ->withTimestamps();
+    }
+
+    /**
+     * Get only granted permissions (permission_type = 'grant').
+     */
+    public function grantedPermissions(): BelongsToMany
+    {
+        return $this->permissions()->wherePivot('permission_type', 'grant');
+    }
+
+    /**
+     * Get only denied permissions (permission_type = 'deny').
+     * These override inherited permissions.
+     */
+    public function deniedPermissions(): BelongsToMany
+    {
+        return $this->permissions()->wherePivot('permission_type', 'deny');
     }
 
     public function wildcards(): BelongsToMany
@@ -196,17 +231,142 @@ class PermissionTemplate extends Model
     // ========================================
 
     /**
-     * Get all permissions including inherited from parent
+     * Get all effective permissions including inherited from all ancestors.
+     * Respects override system: denied permissions block inherited ones.
+     *
+     * Algorithm:
+     * 1. Get all granted permissions from this template
+     * 2. Get all denied permission IDs from this template
+     * 3. Get all ancestor templates (from root to direct parent)
+     * 4. Collect inherited permissions, excluding denied ones
+     *
+     * @return Collection<Permission>
      */
     public function getAllPermissions(): Collection
     {
-        $permissions = $this->permissions;
+        // Get own granted permissions
+        $grantedPermissions = $this->grantedPermissions()->get();
 
-        if ($this->parent_id) {
-            $permissions = $permissions->merge($this->parent->getAllPermissions());
+        // Get own denied permission IDs (these block inheritance)
+        $deniedPermissionIds = $this->deniedPermissions()->pluck('permissions.id')->toArray();
+
+        // Get inherited permissions from all ancestors
+        $inheritedPermissions = collect();
+
+        // Load ancestors from root to closest parent (for proper override cascade)
+        $ancestors = $this->getAncestorsFromRoot();
+
+        foreach ($ancestors as $ancestor) {
+            // Get ancestor's granted permissions
+            $ancestorPermissions = $ancestor->grantedPermissions()->get();
+
+            // Add to inherited, will be filtered later
+            $inheritedPermissions = $inheritedPermissions->merge($ancestorPermissions);
         }
 
-        return $permissions->unique('id');
+        // Filter out denied permissions from inherited
+        $inheritedPermissions = $inheritedPermissions->filter(
+            fn ($permission) => ! in_array($permission->id, $deniedPermissionIds)
+        );
+
+        // Merge own granted + inherited (filtered)
+        return $grantedPermissions
+            ->merge($inheritedPermissions)
+            ->unique('id')
+            ->values();
+    }
+
+    /**
+     * Get only the permissions directly assigned to this template (not inherited).
+     *
+     * @return Collection<Permission>
+     */
+    public function getOwnPermissions(): Collection
+    {
+        return $this->grantedPermissions()->get();
+    }
+
+    /**
+     * Get only inherited permissions (from ancestors).
+     *
+     * @return Collection<Permission>
+     */
+    public function getInheritedPermissions(): Collection
+    {
+        $deniedPermissionIds = $this->deniedPermissions()->pluck('permissions.id')->toArray();
+        $ownPermissionIds = $this->grantedPermissions()->pluck('permissions.id')->toArray();
+
+        $inheritedPermissions = collect();
+        $ancestors = $this->getAncestorsFromRoot();
+
+        foreach ($ancestors as $ancestor) {
+            $ancestorPermissions = $ancestor->grantedPermissions()->get();
+            $inheritedPermissions = $inheritedPermissions->merge($ancestorPermissions);
+        }
+
+        // Filter out denied and own permissions
+        return $inheritedPermissions
+            ->filter(fn ($permission) => ! in_array($permission->id, $deniedPermissionIds))
+            ->filter(fn ($permission) => ! in_array($permission->id, $ownPermissionIds))
+            ->unique('id')
+            ->values();
+    }
+
+    /**
+     * Check if this template has a specific permission (including inherited).
+     */
+    public function hasPermission(Permission|string|int $permission): bool
+    {
+        $permissionId = $permission instanceof Permission
+            ? $permission->id
+            : (is_string($permission)
+                ? Permission::where('slug', $permission)->value('id')
+                : $permission);
+
+        if (! $permissionId) {
+            return false;
+        }
+
+        return $this->getAllPermissions()->contains('id', $permissionId);
+    }
+
+    /**
+     * Grant a permission to this template.
+     */
+    public function grantPermission(Permission|int $permission, string $source = 'direct'): void
+    {
+        $permissionId = $permission instanceof Permission ? $permission->id : $permission;
+
+        $this->permissions()->syncWithoutDetaching([
+            $permissionId => [
+                'permission_type' => 'grant',
+                'source' => $source,
+            ],
+        ]);
+    }
+
+    /**
+     * Deny a permission (override inherited permission).
+     */
+    public function denyPermission(Permission|int $permission): void
+    {
+        $permissionId = $permission instanceof Permission ? $permission->id : $permission;
+
+        $this->permissions()->syncWithoutDetaching([
+            $permissionId => [
+                'permission_type' => 'deny',
+                'source' => 'direct',
+            ],
+        ]);
+    }
+
+    /**
+     * Remove a permission grant or deny from this template.
+     */
+    public function revokePermission(Permission|int $permission): void
+    {
+        $permissionId = $permission instanceof Permission ? $permission->id : $permission;
+        $this->permissions()->detach($permissionId);
     }
 
     /**

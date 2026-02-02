@@ -173,6 +173,9 @@ class PanelNavigationService
 
     /**
      * Get user with all tenant relationships loaded
+     *
+     * Uses withoutGlobalScopes() to prevent Filament's tenant scoping
+     * from affecting the tenant list query
      */
     private static function getUserWithRelations(): ?User
     {
@@ -184,8 +187,17 @@ class PanelNavigationService
             return null;
         }
 
+        // Use fresh query with withoutGlobalScopes on relationships
+        // to ensure all tenants are loaded regardless of current tenant context
         if ($cachedUser === null || $cacheKey !== $user->id) {
-            $cachedUser = User::with(['shops', 'kitchens', 'drivers', 'supervisors', 'suppliers'])
+            $cachedUser = User::withoutGlobalScopes()
+                ->with([
+                    'shops' => fn ($q) => $q->withoutGlobalScopes(),
+                    'kitchens' => fn ($q) => $q->withoutGlobalScopes(),
+                    'drivers' => fn ($q) => $q->withoutGlobalScopes(),
+                    'supervisors' => fn ($q) => $q->withoutGlobalScopes(),
+                    'suppliers' => fn ($q) => $q->withoutGlobalScopes(),
+                ])
                 ->find($user->id);
             $cacheKey = $user->id;
         }

@@ -6,7 +6,6 @@ use App\Models\PermissionTemplate;
 use App\Services\Permissions\PermissionChecker;
 use App\Services\Permissions\WildcardExpander;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -15,9 +14,13 @@ use Illuminate\Support\Str;
  *
  * Handle PermissionTemplate lifecycle events
  *
+ * Note: Hierarchy management (parent/children relationships) is handled by
+ * the HasHierarchy trait via model events. This observer handles only
+ * business logic like wildcard expansion, user sync, and caching.
+ *
  * @author Noflaye Box Team
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 class PermissionTemplateObserver
 {
@@ -54,10 +57,7 @@ class PermissionTemplateObserver
             $this->syncUsersWithTemplate($template);
         }
 
-        // Rebuild hierarchy if parent changed
-        if ($template->isDirty('parent_id')) {
-            $this->rebuildHierarchyForTemplate($template);
-        }
+        // Note: Hierarchy rebuilding is handled by HasHierarchy trait
 
         // Clear template cache
         $this->clearTemplateCache();
@@ -80,8 +80,7 @@ class PermissionTemplateObserver
             throw new \Exception("Cannot delete template with {$usersCount} users assigned");
         }
 
-        // Soft delete children templates
-        $template->children()->delete();
+        // Note: Children soft-deletion and hierarchy cleanup is handled by HasHierarchy trait
 
         return true;
     }
@@ -104,48 +103,6 @@ class PermissionTemplateObserver
             'permission_template_id' => $template->id,
             'users_count' => $users->count(),
         ]);
-    }
-
-    /**
-     * Rebuild hierarchy for template
-     */
-    private function rebuildHierarchyForTemplate(PermissionTemplate $template): void
-    {
-        DB::table('permission_template_hierarchy')
-            ->where('descendant_id', $template->id)
-            ->delete();
-
-        $ancestors = $this->findAncestors($template->id);
-
-        foreach ($ancestors as $depth => $ancestorId) {
-            DB::table('permission_template_hierarchy')->insert([
-                'ancestor_id' => $ancestorId,
-                'descendant_id' => $template->id,
-                'depth' => $depth,
-            ]);
-        }
-
-        $level = count($ancestors);
-        $template->update(['level' => $level]);
-    }
-
-    /**
-     * Find all ancestors recursively
-     */
-    private function findAncestors(int $templateId, int $depth = 0): array
-    {
-        $ancestors = [];
-
-        $parent = DB::table('permission_templates')
-            ->where('id', $templateId)
-            ->value('parent_id');
-
-        if ($parent) {
-            $ancestors[$depth] = $parent;
-            $ancestors = array_merge($ancestors, $this->findAncestors($parent, $depth + 1));
-        }
-
-        return $ancestors;
     }
 
     /**

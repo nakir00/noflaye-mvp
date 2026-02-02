@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Models\UserGroup;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -11,9 +10,13 @@ use Illuminate\Support\Facades\Log;
  *
  * Handle UserGroup lifecycle events
  *
+ * Note: Hierarchy management (parent/children relationships) is handled by
+ * the HasHierarchy trait via model events. This observer handles only
+ * business logic like template sync and logging.
+ *
  * @author Noflaye Box Team
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 class UserGroupObserver
 {
@@ -22,10 +25,7 @@ class UserGroupObserver
      */
     public function created(UserGroup $userGroup): void
     {
-        // Rebuild hierarchy if has parent
-        if ($userGroup->parent_id) {
-            $this->rebuildHierarchyForGroup($userGroup);
-        }
+        // Note: Hierarchy rebuilding is handled by HasHierarchy trait
 
         // Auto-assign template if configured
         if ($userGroup->permission_template_id && $userGroup->auto_sync_template) {
@@ -44,10 +44,10 @@ class UserGroupObserver
      */
     public function updated(UserGroup $userGroup): void
     {
-        // Rebuild hierarchy if parent changed
-        if ($userGroup->isDirty('parent_id')) {
-            $this->rebuildHierarchyForGroup($userGroup);
+        // Note: Hierarchy rebuilding is handled by HasHierarchy trait
 
+        // Log hierarchy changes
+        if ($userGroup->wasChanged('parent_id')) {
             Log::info('UserGroup hierarchy changed', [
                 'group_id' => $userGroup->id,
                 'old_parent_id' => $userGroup->getOriginal('parent_id'),
@@ -56,7 +56,7 @@ class UserGroupObserver
         }
 
         // Re-sync template if changed or auto_sync enabled
-        if ($userGroup->isDirty('permission_template_id') && $userGroup->auto_sync_template) {
+        if ($userGroup->wasChanged('permission_template_id') && $userGroup->auto_sync_template) {
             $this->syncTemplateToUsers($userGroup);
         }
     }
@@ -66,58 +66,12 @@ class UserGroupObserver
      */
     public function deleting(UserGroup $userGroup): void
     {
-        // Soft delete children groups
-        $userGroup->children()->delete();
+        // Note: Children soft-deletion and hierarchy cleanup is handled by HasHierarchy trait
 
-        Log::info('UserGroup deleting with children', [
+        Log::info('UserGroup deleting', [
             'group_id' => $userGroup->id,
             'children_count' => $userGroup->children()->count(),
         ]);
-    }
-
-    /**
-     * Rebuild hierarchy for group
-     */
-    private function rebuildHierarchyForGroup(UserGroup $userGroup): void
-    {
-        // Clear existing hierarchy
-        DB::table('user_group_hierarchy')
-            ->where('descendant_id', $userGroup->id)
-            ->delete();
-
-        // Rebuild ancestors
-        $ancestors = $this->findAncestors($userGroup->id);
-
-        foreach ($ancestors as $depth => $ancestorId) {
-            DB::table('user_group_hierarchy')->insert([
-                'ancestor_id' => $ancestorId,
-                'descendant_id' => $userGroup->id,
-                'depth' => $depth,
-            ]);
-        }
-
-        // Recalculate level
-        $level = count($ancestors);
-        $userGroup->update(['level' => $level]);
-    }
-
-    /**
-     * Find all ancestors recursively
-     */
-    private function findAncestors(int $groupId, int $depth = 0): array
-    {
-        $ancestors = [];
-
-        $parent = DB::table('user_groups')
-            ->where('id', $groupId)
-            ->value('parent_id');
-
-        if ($parent) {
-            $ancestors[$depth] = $parent;
-            $ancestors = array_merge($ancestors, $this->findAncestors($parent, $depth + 1));
-        }
-
-        return $ancestors;
     }
 
     /**

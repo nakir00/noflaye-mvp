@@ -456,13 +456,25 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     {
         $panelId = $panel->getId();
 
+        // Use withoutGlobalScopes() to prevent Filament's tenant scoping
+        // from affecting the tenant list query
         return match ($panelId) {
             'admin' => collect([]),
-            'shop' => $this->hasAnyTemplate(['super_admin', 'admin']) ? Shop::all() : $this->shops,
-            'kitchen' => $this->hasAnyTemplate(['super_admin', 'admin']) ? Kitchen::all() : $this->kitchens,
-            'driver' => $this->hasAnyTemplate(['super_admin', 'admin']) ? Driver::all() : $this->drivers,
-            'supplier' => $this->hasAnyTemplate(['super_admin', 'admin']) ? Supplier::all() : $this->suppliers,
-            'supervisor' => $this->hasAnyTemplate(['super_admin', 'admin']) ? Supervisor::all() : $this->supervisors,
+            'shop' => $this->hasAnyTemplate(['super_admin', 'admin'])
+                ? Shop::withoutGlobalScopes()->get()
+                : $this->shops()->withoutGlobalScopes()->get(),
+            'kitchen' => $this->hasAnyTemplate(['super_admin', 'admin'])
+                ? Kitchen::withoutGlobalScopes()->get()
+                : $this->kitchens()->withoutGlobalScopes()->get(),
+            'driver' => $this->hasAnyTemplate(['super_admin', 'admin'])
+                ? Driver::withoutGlobalScopes()->get()
+                : $this->drivers()->withoutGlobalScopes()->get(),
+            'supplier' => $this->hasAnyTemplate(['super_admin', 'admin'])
+                ? Supplier::withoutGlobalScopes()->get()
+                : $this->suppliers()->withoutGlobalScopes()->get(),
+            'supervisor' => $this->hasAnyTemplate(['super_admin', 'admin'])
+                ? Supervisor::withoutGlobalScopes()->get()
+                : $this->supervisors()->withoutGlobalScopes()->get(),
             default => collect([]),
         };
     }

@@ -14,11 +14,18 @@ use Illuminate\Support\Facades\Cache;
 /**
  * PermissionChecker Service
  *
- * Check user permissions with scope and condition support
+ * Check user permissions with scope and condition support.
+ * Supports hierarchical permission templates and user groups with override system.
+ *
+ * Permission Sources (checked in order):
+ * 1. Direct user permissions
+ * 2. Template permissions (with hierarchy inheritance and override)
+ * 3. User group permissions (with hierarchy inheritance and override)
+ * 4. Delegated permissions
  *
  * @author Noflaye Box Team
  *
- * @version 1.0.0
+ * @version 2.0.0
  */
 class PermissionChecker
 {
@@ -86,8 +93,13 @@ class PermissionChecker
             return true;
         }
 
-        // Check template permissions
+        // Check template permissions (with hierarchy and override)
         if ($this->hasTemplatePermission($user, $permissionSlug, $scopeInstance, $request)) {
+            return true;
+        }
+
+        // Check user group permissions (with hierarchy and override)
+        if ($this->hasUserGroupPermission($user, $permissionSlug, $scopeInstance)) {
             return true;
         }
 
@@ -138,6 +150,13 @@ class PermissionChecker
     /**
      * Get all user permissions with scope
      *
+     * Collects permissions from:
+     * 1. Direct user permissions
+     * 2. Template permissions (including inherited via hierarchy, respecting overrides)
+     * 3. User group permissions (including inherited via hierarchy, respecting overrides)
+     * 4. Wildcard expanded permissions
+     * 5. Delegated permissions
+     *
      * @return Collection<Permission>
      */
     public function getAllUserPermissions(User $user, ?Scope $scope = null): Collection
@@ -147,29 +166,39 @@ class PermissionChecker
         return Cache::remember($cacheKey, 600, function () use ($user, $scope) {
             $permissions = collect();
 
-            // Direct permissions
+            // 1. Direct permissions
             $directPerms = $user->permissions()
                 ->when($scope, fn ($q) => $q->where('scope_id', $scope->id))
                 ->get();
 
             $permissions = $permissions->merge($directPerms);
 
-            // Template permissions
+            // 2. Template permissions (includes inherited and respects overrides)
             $templates = $user->templates()
                 ->when($scope, fn ($q) => $q->where('scope_id', $scope->id))
-                ->with(['permissions', 'wildcards'])
+                ->with(['wildcards'])
                 ->get();
 
             foreach ($templates as $template) {
-                // Direct template permissions
+                // Get all effective permissions (inherited + own - denied)
                 $permissions = $permissions->merge($template->getAllPermissions());
 
-                // Wildcard expanded permissions
+                // 4. Wildcard expanded permissions
                 $wildcardPerms = $this->wildcardExpander->expandForTemplate($template);
                 $permissions = $permissions->merge($wildcardPerms);
             }
 
-            // Delegated permissions
+            // 3. User group permissions (includes inherited and respects overrides)
+            $userGroups = $user->userGroups()
+                ->when($scope, fn ($q) => $q->wherePivot('scope_id', $scope->id))
+                ->get();
+
+            foreach ($userGroups as $group) {
+                // Get all effective permissions from group (inherited + template + own - denied)
+                $permissions = $permissions->merge($group->getAllPermissions());
+            }
+
+            // 5. Delegated permissions
             $delegations = PermissionDelegation::active()
                 ->where('delegatee_id', $user->id)
                 ->when($scope, fn ($q) => $q->where('scope_id', $scope->id))
@@ -177,7 +206,9 @@ class PermissionChecker
                 ->get();
 
             foreach ($delegations as $delegation) {
-                $permissions->push($delegation->permission);
+                if ($delegation->permission) {
+                    $permissions->push($delegation->permission);
+                }
             }
 
             return $permissions->unique('id');
@@ -214,6 +245,10 @@ class PermissionChecker
 
     /**
      * Check template permission
+     *
+     * Uses getAllPermissions() which respects:
+     * - Hierarchical inheritance (permissions from parent templates)
+     * - Override system (denied permissions block inherited ones)
      */
     private function hasTemplatePermission(
         User $user,
@@ -223,12 +258,13 @@ class PermissionChecker
     ): bool {
         $templates = $user->templates()
             ->when($scope, fn ($q) => $q->where('user_templates.scope_id', $scope->id))
-            ->with(['permissions', 'wildcards'])
+            ->with(['wildcards'])
             ->get();
 
         foreach ($templates as $template) {
-            // Check direct permissions
-            if ($template->permissions->contains('slug', $permissionSlug)) {
+            // Check all effective permissions (includes inherited, respects overrides)
+            $allPermissions = $template->getAllPermissions();
+            if ($allPermissions->contains('slug', $permissionSlug)) {
                 return true;
             }
 
@@ -239,6 +275,34 @@ class PermissionChecker
                 if ($permission && $this->wildcardExpander->matchesPattern($permission, $wildcard->pattern)) {
                     return true;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check user group permission
+     *
+     * Uses getAllPermissions() which respects:
+     * - Hierarchical inheritance (permissions from parent groups)
+     * - Template inheritance (permissions from group's template)
+     * - Override system (denied permissions block inherited ones)
+     */
+    private function hasUserGroupPermission(
+        User $user,
+        string $permissionSlug,
+        ?Scope $scope
+    ): bool {
+        $userGroups = $user->userGroups()
+            ->when($scope, fn ($q) => $q->wherePivot('scope_id', $scope->id))
+            ->get();
+
+        foreach ($userGroups as $group) {
+            // Check all effective permissions (includes inherited + template, respects overrides)
+            $allPermissions = $group->getAllPermissions();
+            if ($allPermissions->contains('slug', $permissionSlug)) {
+                return true;
             }
         }
 
